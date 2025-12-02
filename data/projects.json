@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "title": "Urban Bridge Initiative",
+    "category": "Structural Design",
+    "status": "Completed",
+    "specs": "Steel / Concrete / 500m Span",
+    "mode": "civil",
+    "imageUrl": "/uploads/1764677023015-345851857-bridge.jpeg"
+  },
+  {
+    "id": "2",
+    "title": "Eco-Foundation System",
+    "category": "Sustainable Infrastructure",
+    "status": "In Progress",
+    "specs": "Recycled Materials / High Load",
+    "mode": "civil"
+  },
+  {
+    "id": "3",
+    "title": "City Water Grid",
+    "category": "Hydraulics",
+    "status": "Analysis Phase",
+    "specs": "Fluid Dynamics / Network Opt.",
+    "mode": "civil",
+    "imageUrl": "/uploads/1764669582806-919376046-water_grid.jpeg"
+  },
+  {
+    "id": "4",
+    "title": "PlanMorph",
+    "description": "AI-powered SaaS for engineering project management.",
+    "stack": [
+      "Next.js",
+      "AI",
+      "PostgreSQL"
+    ],
+    "link": "https://tech.planmorph.software/",
+    "githubLink": "https://github.com/code-nexus-342/planmorph-tech",
+    "mode": "tech",
+    "imageUrl": "/uploads/1764671005326-297111195-planmorph.jpg"
+  }
+]

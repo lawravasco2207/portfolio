@@ -1,0 +1,25 @@
+name: portfolio
+region: nyc
+services:
+- name: web
+  image:
+    registry_type: GHCR
+    repository: larry/portfolio # Placeholder, user needs to update
+    tag: latest
+  http_port: 3000
+  envs:
+  - key: SMTP_HOST
+    scope: RUN_TIME
+    type: SECRET
+  - key: SMTP_PORT
+    scope: RUN_TIME
+    type: SECRET
+  - key: SMTP_SECURE
+    scope: RUN_TIME
+    type: SECRET
+  - key: SMTP_USER
+    scope: RUN_TIME
+    type: SECRET
+  - key: SMTP_PASS
+    scope: RUN_TIME
+    type: SECRET
