@@ -23,3 +23,18 @@ services:
   - key: SMTP_PASS
     scope: RUN_TIME
     type: SECRET
+  - key: DO_SPACES_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: DO_SPACES_SECRET
+    scope: RUN_TIME
+    type: SECRET
+  - key: DO_SPACES_BUCKET
+    scope: RUN_TIME
+    type: SECRET
+  - key: DO_SPACES_REGION
+    scope: RUN_TIME
+    type: SECRET
+  - key: DO_SPACES_ENDPOINT
+    scope: RUN_TIME
+    type: SECRET

@@ -48,6 +48,9 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
+# Copy data files for JSON-based storage
+COPY --from=builder --chown=nextjs:nodejs /app/data ./data
+
 # Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next

@@ -1,11 +1,10 @@
 'use server';
 
-import { promises as fs } from 'fs';
-import path from 'path';
 import nodemailer from 'nodemailer';
+import { getJSON, putJSON, uploadFile } from '@/lib/spaces';
 
-const dataPath = path.join(process.cwd(), 'data', 'projects.json');
-const featuredPath = path.join(process.cwd(), 'data', 'featured.json');
+const PROJECTS_KEY = 'data/projects.json';
+const FEATURED_KEY = 'data/featured.json';
 
 export interface FeaturedStartup {
   title: string;
@@ -20,8 +19,7 @@ export interface FeaturedStartup {
 
 export async function getFeatured(): Promise<FeaturedStartup | null> {
   try {
-    const data = await fs.readFile(featuredPath, 'utf8');
-    return JSON.parse(data);
+    return await getJSON<FeaturedStartup>(FEATURED_KEY);
   } catch (error) {
     console.error('Failed to read featured:', error);
     return null;
@@ -29,7 +27,7 @@ export async function getFeatured(): Promise<FeaturedStartup | null> {
 }
 
 export async function saveFeatured(featured: FeaturedStartup) {
-  await fs.writeFile(featuredPath, JSON.stringify(featured, null, 2));
+  await putJSON(FEATURED_KEY, featured);
   return { success: true };
 }
 
@@ -63,14 +61,11 @@ export async function uploadImage(formData: FormData) {
   const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
   const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
   const filename = `${uniqueSuffix}-${safeName}`;
-
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+  const key = `uploads/${filename}`;
 
   try {
-    await fs.mkdir(uploadDir, { recursive: true });
-    const filepath = path.join(uploadDir, filename);
-    await fs.writeFile(filepath, buffer);
-    return { success: true, url: `/uploads/${filename}` };
+    const url = await uploadFile(key, buffer, file.type || 'application/octet-stream');
+    return { success: true, url };
   } catch (error) {
     console.error('Upload error:', error);
     return { success: false, error: 'Upload failed' };
@@ -79,8 +74,8 @@ export async function uploadImage(formData: FormData) {
 
 export async function getProjects(): Promise<Project[]> {
   try {
-    const data = await fs.readFile(dataPath, 'utf8');
-    return JSON.parse(data);
+    const data = await getJSON<Project[]>(PROJECTS_KEY);
+    return data ?? [];
   } catch (error) {
     console.error('Failed to read projects:', error);
     return [];
@@ -97,14 +92,14 @@ export async function saveProject(project: Project) {
     projects.push(project);
   }
 
-  await fs.writeFile(dataPath, JSON.stringify(projects, null, 2));
+  await putJSON(PROJECTS_KEY, projects);
   return { success: true };
 }
 
 export async function deleteProject(id: string) {
   const projects = await getProjects();
   const filtered = projects.filter((p) => p.id !== id);
-  await fs.writeFile(dataPath, JSON.stringify(filtered, null, 2));
+  await putJSON(PROJECTS_KEY, filtered);
   return { success: true };
 }
 
