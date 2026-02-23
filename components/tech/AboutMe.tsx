@@ -1,7 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Terminal, Cpu, Network } from 'lucide-react';
+import { Terminal, Cpu, Network, Cloud, Code2, Rocket } from 'lucide-react';
+
+const highlights = [
+  { icon: Terminal, label: 'Full Stack', desc: 'End-to-end systems' },
+  { icon: Cpu, label: 'AI Integration', desc: 'Intelligent workflows' },
+  { icon: Cloud, label: 'Cloud Architecture', desc: 'Scalable infra' },
+  { icon: Network, label: 'Distributed', desc: 'High-availability' },
+  { icon: Code2, label: 'Clean Code', desc: 'Maintainable systems' },
+  { icon: Rocket, label: 'Founder Mindset', desc: 'Product thinking' },
+];
 
 export function TechAboutMe() {
   return (
@@ -11,38 +20,46 @@ export function TechAboutMe() {
           <span className="text-electric-cyan">{'>'}</span> WHOAMI
         </h3>
         <p className="text-cyan-100/80 leading-relaxed font-light text-sm md:text-base">
-          I engineer scalable digital ecosystems. My focus is on high-availability architectures, distributed systems, and seamless user experiences.
-          From optimizing backend latency to crafting reactive frontend interfaces, I deploy robust full-stack solutions.
-          Currently accelerating engineering workflows at <span className="text-electric-cyan font-bold">PlanMorph</span>.
+          I am a full-stack software engineer and systems builder. I design and deploy
+          scalable, production-ready systems with a focus on high-availability architectures,
+          distributed systems, and AI-enhanced workflows.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-          <div className="p-4 border border-electric-cyan/20 bg-electric-cyan/5 rounded-lg backdrop-blur-sm">
-            <Terminal className="w-6 h-6 text-electric-cyan mb-2" />
-            <h4 className="font-bold text-white text-sm">Full Stack</h4>
-          </div>
-          <div className="p-4 border border-electric-cyan/20 bg-electric-cyan/5 rounded-lg backdrop-blur-sm">
-            <Cpu className="w-6 h-6 text-electric-cyan mb-2" />
-            <h4 className="font-bold text-white text-sm">AI Integration</h4>
-          </div>
-          <div className="p-4 border border-electric-cyan/20 bg-electric-cyan/5 rounded-lg backdrop-blur-sm">
-            <Network className="w-6 h-6 text-electric-cyan mb-2" />
-            <h4 className="font-bold text-white text-sm">Microservices</h4>
-          </div>
-        </div>
+        <p className="text-cyan-100/60 leading-relaxed font-light text-sm md:text-base">
+          My stack spans <span className="text-electric-cyan">Python</span>,{' '}
+          <span className="text-electric-cyan">C# / .NET</span>,{' '}
+          <span className="text-electric-cyan">React / Next.js</span>,{' '}
+          <span className="text-electric-cyan">TypeScript</span>,{' '}
+          <span className="text-electric-cyan">Node.js</span>, and{' '}
+          <span className="text-electric-cyan">PostgreSQL</span> — deployed via{' '}
+          <span className="text-electric-cyan">Docker</span> on{' '}
+          <span className="text-electric-cyan">Azure</span>,{' '}
+          <span className="text-electric-cyan">DigitalOcean</span>, and{' '}
+          <span className="text-electric-cyan">AWS</span>.
+        </p>
+        <p className="text-cyan-100/60 leading-relaxed font-light text-sm md:text-base">
+          Currently building{' '}
+          <span className="text-electric-cyan font-bold">PlanMorph</span> — an AI-powered
+          SaaS platform for engineering project management. I think like a founder, build
+          like an engineer, and care about systems that work, scale, and last.
+        </p>
       </div>
 
-      <div className="relative h-64 md:h-auto border border-electric-cyan/20 bg-black/40 rounded-lg flex items-center justify-center overflow-hidden font-mono text-xs text-cyan-500/50 p-4 min-h-[250px]">
-        <div className="w-full h-full overflow-hidden">
-            <p>$ init system...</p>
-            <p>$ loading modules...</p>
-            <p className="text-electric-cyan">$ core_systems_online</p>
-            <br/>
-            <p>{`{`}</p>
-            <p className="pl-4">"name": "Larry",</p>
-            <p className="pl-4">"role": "Tech Engineer",</p>
-            <p className="pl-4">"status": "Building"</p>
-            <p>{`}`}</p>
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {highlights.map((item, index) => (
+          <motion.div
+            key={item.label}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            whileHover={{ scale: 1.03, borderColor: 'rgba(0, 229, 255, 0.5)' }}
+            className="p-4 border border-electric-cyan/15 bg-electric-cyan/5 rounded-lg backdrop-blur-sm transition-all duration-300 cursor-default"
+          >
+            <item.icon className="w-5 h-5 text-electric-cyan mb-2" />
+            <h4 className="font-bold text-white text-xs mb-0.5">{item.label}</h4>
+            <p className="text-[10px] text-gray-500">{item.desc}</p>
+          </motion.div>
+        ))}
       </div>
     </section>
   );

@@ -4,7 +4,7 @@ services:
 - name: web
   image:
     registry_type: GHCR
-    repository: larry/portfolio # Placeholder, user needs to update
+    repository: larry/portfolio
     tag: latest
   http_port: 3000
   envs:

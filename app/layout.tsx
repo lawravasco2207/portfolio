@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ModeSwitcher } from "@/components/ModeSwitcher";
 import { SocialLinks } from "@/components/SocialLinks";
 
 const inter = Inter({
@@ -15,10 +14,17 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Larry | Engineering Portfolio",
-  description: "A dual-domain engineering portfolio bridging Civil and Tech.",
+  title: "Larry | Full Stack Engineer & Systems Architect",
+  description:
+    "Full Stack Engineering // AI Systems // Cloud Infrastructure. I design and deploy scalable digital ecosystems.",
   icons: {
-    icon: '/favicon.jpg',
+    icon: "/favicon.jpg",
+  },
+  openGraph: {
+    title: "Larry | Full Stack Engineer & Systems Architect",
+    description:
+      "Full Stack Engineering // AI Systems // Cloud Infrastructure",
+    type: "website",
   },
 };
 
@@ -32,7 +38,6 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-deep-charcoal text-soft-white selection:bg-electric-cyan selection:text-deep-charcoal`}
       >
-        <ModeSwitcher />
         <SocialLinks />
         {children}
       </body>

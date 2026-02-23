@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Footer } from '@/components/Footer';
 
 export function TechLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,29 +13,37 @@ export function TechLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Content Container */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
         className="relative z-10 container mx-auto px-4 py-20"
       >
-        <header className="mb-12 border-b border-electric-cyan/30 pb-4 flex justify-between items-end">
+        <header className="mb-12 border-b border-electric-cyan/30 pb-4 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
           <div>
             <h2 className="text-3xl font-bold text-electric-cyan tracking-tighter">
               SYSTEM_OVERRIDE
             </h2>
             <p className="text-sm text-cyan-300/70 mt-2 font-mono">
-              Full Stack Engineering // AI Systems // Automation
+              Full Stack Engineering // AI Systems // Cloud Infrastructure
             </p>
           </div>
-          <div className="hidden md:block text-right font-mono text-xs text-cyan-500/50">
-            <div>UPTIME: 99.9%</div>
-            <div>LATENCY: 12ms</div>
+          <div className="flex gap-6 font-mono text-xs text-cyan-500/50">
+            <div className="text-right">
+              <div>UPTIME: <span className="text-green-400">99.99%</span></div>
+              <div>LATENCY: <span className="text-yellow-300">12ms</span></div>
+            </div>
+            <div className="text-right">
+              <div>BUILD: <span className="text-electric-cyan">stable</span></div>
+              <div>DEPLOY: <span className="text-green-400">active</span></div>
+            </div>
           </div>
         </header>
-        
+
         {children}
       </motion.div>
+
+      <Footer />
     </div>
   );
 }

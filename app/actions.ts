@@ -2,31 +2,23 @@
 
 import { promises as fs } from 'fs';
 import path from 'path';
+import nodemailer from 'nodemailer';
 
 const dataPath = path.join(process.cwd(), 'data', 'projects.json');
 
 export interface Project {
   id: string;
   title: string;
-  mode: 'civil' | 'tech';
-  // Civil props
-  category?: string;
-  status?: string;
-  specs?: string;
-  // Tech props
+  mode: 'tech';
   description?: string;
   stack?: string[];
   link?: string;
   githubLink?: string;
-  // Shared
   imageUrl?: string;
 }
 
 export async function verifyAdmin(password: string) {
-  // In a real app, use environment variables. 
-  // For this specific request, we hardcode the secret phrase.
-  if (password === "I love Jacky") {
-    // Set a cookie or return a token in a real app
+  if (password === 'I love Jacky') {
     return { success: true };
   }
   return { success: false };
@@ -41,14 +33,12 @@ export async function uploadImage(formData: FormData) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  // Create unique filename to prevent overwrites
-  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-  // Sanitize filename
+  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
   const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
   const filename = `${uniqueSuffix}-${safeName}`;
-  
+
   const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-  
+
   try {
     await fs.mkdir(uploadDir, { recursive: true });
     const filepath = path.join(uploadDir, filename);
@@ -91,8 +81,6 @@ export async function deleteProject(id: string) {
   return { success: true };
 }
 
-import nodemailer from 'nodemailer';
-
 export async function sendEmail(data: { email: string; message: string }) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -104,18 +92,12 @@ export async function sendEmail(data: { email: string; message: string }) {
     },
   });
 
-  console.log(`Attempting to send email via ${process.env.SMTP_HOST}:${process.env.SMTP_PORT} (Secure: ${process.env.SMTP_SECURE})`);
-
   try {
     await transporter.sendMail({
       from: `"Portfolio Terminal" <${process.env.SMTP_USER}>`,
-      to: "syokslawrence@gmail.com",
+      to: 'syokslawrence@gmail.com',
       subject: `New Transmission from ${data.email}`,
-      text: `
-        IDENTITY: ${data.email}
-        PAYLOAD:
-        ${data.message}
-      `,
+      text: `IDENTITY: ${data.email}\nPAYLOAD:\n${data.message}`,
       html: `
         <div style="font-family: monospace; background: #000; color: #00E5FF; padding: 20px;">
           <h2>/// INCOMING TRANSMISSION ///</h2>

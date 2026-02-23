@@ -2,8 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
-import { cn } from '@/lib/utils';
 
 const socials = [
   { name: 'GitHub', icon: Github, href: 'https://github.com/lawravasco2207', label: 'Code Repositories' },
@@ -13,12 +11,6 @@ const socials = [
 ];
 
 export function SocialLinks() {
-  const { mode } = useAppStore();
-
-  if (mode === 'entry') return null;
-
-  const isCivil = mode === 'civil';
-
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -34,36 +26,22 @@ export function SocialLinks() {
           rel="noopener noreferrer"
           className="group relative flex items-center justify-end"
         >
-          <span 
-            className={cn(
-              "absolute right-full mr-4 px-2 py-1 text-xs font-mono rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none",
-              isCivil ? "bg-blueprint-blue/10 text-blueprint-blue border border-blueprint-blue/30" : "bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/30"
-            )}
+          <span
+            className="absolute right-full mr-4 px-2 py-1 text-xs font-mono rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/30"
           >
             {social.label}
           </span>
           <div
-            className={cn(
-              "p-3 rounded-full transition-all duration-300 border",
-              isCivil 
-                ? "bg-deep-charcoal border-blueprint-blue/30 text-blue-200 hover:text-white hover:bg-blueprint-blue hover:border-blueprint-blue" 
-                : "bg-deep-charcoal border-electric-cyan/30 text-cyan-200 hover:text-deep-charcoal hover:bg-electric-cyan hover:border-electric-cyan"
-            )}
+            className="p-3 rounded-full transition-all duration-300 border bg-deep-charcoal border-electric-cyan/30 text-cyan-200 hover:text-deep-charcoal hover:bg-electric-cyan hover:border-electric-cyan hover:shadow-[0_0_20px_rgba(0,229,255,0.3)]"
           >
             <social.icon className="w-5 h-5" />
           </div>
         </a>
       ))}
-      
+
       {/* Vertical Line Connector */}
-      <div className={cn(
-        "absolute top-full left-1/2 w-px h-24 -translate-x-1/2 mt-4 bg-gradient-to-b from-transparent to-transparent",
-        isCivil ? "via-blueprint-blue/30" : "via-electric-cyan/30"
-      )} />
-      <div className={cn(
-        "absolute bottom-full left-1/2 w-px h-24 -translate-x-1/2 mb-4 bg-gradient-to-t from-transparent to-transparent",
-        isCivil ? "via-blueprint-blue/30" : "via-electric-cyan/30"
-      )} />
+      <div className="absolute top-full left-1/2 w-px h-24 -translate-x-1/2 mt-4 bg-gradient-to-b from-transparent via-electric-cyan/30 to-transparent" />
+      <div className="absolute bottom-full left-1/2 w-px h-24 -translate-x-1/2 mb-4 bg-gradient-to-t from-transparent via-electric-cyan/30 to-transparent" />
     </motion.div>
   );
 }
