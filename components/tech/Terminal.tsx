@@ -69,6 +69,13 @@ export function TechTerminal() {
       const newHistory = [...history, `$ ${val}`];
 
       if (mode === 'email') {
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(val)) {
+          setHistory([...newHistory, '[✗] Invalid email format. Please enter a valid email address:']);
+          setInput('');
+          return;
+        }
         setContactData((prev) => ({ ...prev, email: val }));
         setMode('message');
         setHistory([...newHistory, 'Identity verified. Enter your message payload:']);

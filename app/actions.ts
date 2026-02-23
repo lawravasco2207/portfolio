@@ -5,6 +5,33 @@ import path from 'path';
 import nodemailer from 'nodemailer';
 
 const dataPath = path.join(process.cwd(), 'data', 'projects.json');
+const featuredPath = path.join(process.cwd(), 'data', 'featured.json');
+
+export interface FeaturedStartup {
+  title: string;
+  tagline: string;
+  description: string;
+  stack: string[];
+  liveUrl: string;
+  githubUrl: string;
+  caseStudy: string;
+  caseStudyPoints: string[];
+}
+
+export async function getFeatured(): Promise<FeaturedStartup | null> {
+  try {
+    const data = await fs.readFile(featuredPath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Failed to read featured:', error);
+    return null;
+  }
+}
+
+export async function saveFeatured(featured: FeaturedStartup) {
+  await fs.writeFile(featuredPath, JSON.stringify(featured, null, 2));
+  return { success: true };
+}
 
 export interface Project {
   id: string;

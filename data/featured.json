@@ -1,0 +1,15 @@
+{
+  "title": "PlanMorph",
+  "tagline": "AI-Powered Engineering Project Management",
+  "description": "The future of engineering project management. AI-driven workflows, automated resource allocation, and predictive analytics — built for teams that ship.",
+  "stack": ["Next.js", "TypeScript", "Node.js", "PostgreSQL", "Docker", "DigitalOcean", "AI APIs", "TailwindCSS"],
+  "liveUrl": "https://tech.planmorph.software/",
+  "githubUrl": "https://github.com/code-nexus-342/planmorph-tech",
+  "caseStudy": "PlanMorph addresses critical inefficiencies in traditional engineering project management. By leveraging AI APIs and machine learning pipelines, it predicts project bottlenecks before they occur and automates resource allocation across complex project timelines.",
+  "caseStudyPoints": [
+    "Reduced resource idle time by 40% in beta trials",
+    "Automated Gantt chart generation from raw scope data",
+    "Real-time budget tracking with predictive overrun alerts",
+    "Cloud-native deployment with zero-downtime updates"
+  ]
+}

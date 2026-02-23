@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getProjects, saveProject, deleteProject, verifyAdmin, type Project } from '@/app/actions';
-import { Trash2, Plus, Save, Lock, Image as ImageIcon } from 'lucide-react';
+import { getProjects, saveProject, deleteProject, verifyAdmin, getFeatured, saveFeatured, type Project, type FeaturedStartup } from '@/app/actions';
+import { Trash2, Plus, Save, Lock, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { TagInput } from '@/components/admin/TagInput';
 
 export default function AdminPage() {
@@ -10,6 +10,9 @@ export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [editing, setEditing] = useState<Project | null>(null);
+  const [featured, setFeatured] = useState<FeaturedStartup | null>(null);
+  const [editingFeatured, setEditingFeatured] = useState(false);
+  const [activeTab, setActiveTab] = useState<'projects' | 'featured'>('projects');
 
   useEffect(() => {
     if (sessionStorage.getItem('admin_auth') === 'true') {
@@ -33,6 +36,8 @@ export default function AdminPage() {
   async function loadProjects() {
     const data = await getProjects();
     setProjects(data);
+    const feat = await getFeatured();
+    if (feat) setFeatured(feat);
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -107,6 +112,23 @@ export default function AdminPage() {
         </div>
       </header>
 
+      {/* Tab switcher */}
+      <div className="flex gap-2 mb-8">
+        <button
+          onClick={() => setActiveTab('projects')}
+          className={`px-4 py-2 rounded text-sm font-bold transition-colors ${activeTab === 'projects' ? 'bg-electric-cyan text-deep-charcoal' : 'border border-white/20 text-gray-400 hover:text-white hover:bg-white/5'}`}
+        >
+          Projects
+        </button>
+        <button
+          onClick={() => setActiveTab('featured')}
+          className={`px-4 py-2 rounded text-sm font-bold transition-colors flex items-center gap-2 ${activeTab === 'featured' ? 'bg-electric-cyan text-deep-charcoal' : 'border border-white/20 text-gray-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <Sparkles className="w-3 h-3" /> Featured Startup
+        </button>
+      </div>
+
+      {activeTab === 'projects' ? (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Project List */}
         <div className="space-y-4">
@@ -233,6 +255,106 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+      ) : (
+        /* Featured Startup Editor */
+        <div className="max-w-2xl">
+          {featured ? (
+            <div className="border border-electric-cyan/30 p-6 rounded bg-black/40 space-y-4">
+              <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-electric-cyan" />
+                Edit Featured Startup
+              </h2>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Title</label>
+                <input
+                  value={featured.title}
+                  onChange={(e) => setFeatured({ ...featured, title: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 p-2 rounded text-white focus:border-electric-cyan outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Tagline</label>
+                <input
+                  value={featured.tagline}
+                  onChange={(e) => setFeatured({ ...featured, tagline: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 p-2 rounded text-white focus:border-electric-cyan outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Description</label>
+                <textarea
+                  value={featured.description}
+                  onChange={(e) => setFeatured({ ...featured, description: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 p-2 rounded text-white focus:border-electric-cyan outline-none h-24"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Tech Stack</label>
+                <TagInput
+                  tags={featured.stack}
+                  onChange={(newTags) => setFeatured({ ...featured, stack: newTags })}
+                  placeholder="Type and press Enter..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Live URL</label>
+                <input
+                  value={featured.liveUrl}
+                  onChange={(e) => setFeatured({ ...featured, liveUrl: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full bg-white/5 border border-white/10 p-2 rounded text-white focus:border-electric-cyan outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">GitHub URL</label>
+                <input
+                  value={featured.githubUrl}
+                  onChange={(e) => setFeatured({ ...featured, githubUrl: e.target.value })}
+                  placeholder="https://github.com/..."
+                  className="w-full bg-white/5 border border-white/10 p-2 rounded text-white focus:border-electric-cyan outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Case Study</label>
+                <textarea
+                  value={featured.caseStudy}
+                  onChange={(e) => setFeatured({ ...featured, caseStudy: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 p-2 rounded text-white focus:border-electric-cyan outline-none h-24"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Case Study Points (one per line)</label>
+                <textarea
+                  value={featured.caseStudyPoints.join('\n')}
+                  onChange={(e) => setFeatured({ ...featured, caseStudyPoints: e.target.value.split('\n').filter(Boolean) })}
+                  className="w-full bg-white/5 border border-white/10 p-2 rounded text-white focus:border-electric-cyan outline-none h-32"
+                  placeholder="One point per line..."
+                />
+              </div>
+
+              <button
+                onClick={async () => {
+                  await saveFeatured(featured);
+                  alert('Featured startup saved!');
+                }}
+                className="w-full bg-electric-cyan text-deep-charcoal font-bold py-2 rounded hover:bg-cyan-300 transition-colors"
+              >
+                Save Featured Startup
+              </button>
+            </div>
+          ) : (
+            <p className="text-gray-500">No featured data found.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
