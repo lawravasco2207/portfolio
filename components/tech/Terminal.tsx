@@ -52,7 +52,7 @@ const DEPLOY_TEXT = `DEPLOYMENT STATUS:
   └─────────────────────────────────┘`;
 
 export function TechTerminal() {
-  const [history, setHistory] = useState<string[]>(['LarryOS v2.0 — Production Environment', 'Type "help" for available commands.', '']);
+  const [history, setHistory] = useState<string[]>(['Larry v2.0 — Production Environment', 'Type "help" for available commands.', '']);
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<'command' | 'email' | 'message'>('command');
   const [contactData, setContactData] = useState({ email: '', message: '' });
