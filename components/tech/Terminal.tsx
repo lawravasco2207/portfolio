@@ -120,6 +120,10 @@ export function TechTerminal() {
         case 'deploy':
           response = DEPLOY_TEXT;
           break;
+        case 'billionare':
+          response = 'ACCESS GRANTED. Redirecting to admin portal...';
+          setTimeout(() => window.open('/admin', '_self'), 800);
+          break;
         case 'clear':
           setHistory([]);
           setInput('');
