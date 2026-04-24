@@ -182,7 +182,7 @@ export default function AdminPage() {
                 <div className="flex items-center gap-4">
                   {editing.imageUrl && (
                     <div className="relative w-16 h-16 rounded overflow-hidden border border-white/20 group">
-                      <Image src={editing.imageUrl} alt="Preview" fill className="object-cover" />
+                      <Image src={editing.imageUrl} alt="Preview" fill sizes="64px" className="object-cover" />
                       <button
                         type="button"
                         onClick={() => setEditing({ ...editing, imageUrl: '' })}
