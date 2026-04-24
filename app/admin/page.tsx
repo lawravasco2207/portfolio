@@ -1,32 +1,49 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { getProjects, saveProject, deleteProject, verifyAdmin, getFeatured, saveFeatured, type Project, type FeaturedStartup } from '@/app/actions';
 import { Trash2, Plus, Save, Lock, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { TagInput } from '@/components/admin/TagInput';
 
+function subscribeToAdminAuth(callback: () => void) {
+  window.addEventListener('storage', callback);
+  window.addEventListener('admin-auth-change', callback);
+
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener('admin-auth-change', callback);
+  };
+}
+
+function getAdminAuthSnapshot() {
+  return window.sessionStorage.getItem('admin_auth') === 'true';
+}
+
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const isAuthenticated = useSyncExternalStore(
+    subscribeToAdminAuth,
+    getAdminAuthSnapshot,
+    () => false,
+  );
   const [password, setPassword] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [editing, setEditing] = useState<Project | null>(null);
   const [featured, setFeatured] = useState<FeaturedStartup | null>(null);
-  const [editingFeatured, setEditingFeatured] = useState(false);
   const [activeTab, setActiveTab] = useState<'projects' | 'featured'>('projects');
 
   useEffect(() => {
-    if (sessionStorage.getItem('admin_auth') === 'true') {
-      setIsAuthenticated(true);
+    if (isAuthenticated) {
       loadProjects();
     }
-  }, []);
+  }, [isAuthenticated]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     const result = await verifyAdmin(password);
     if (result.success) {
-      setIsAuthenticated(true);
       sessionStorage.setItem('admin_auth', 'true');
+      window.dispatchEvent(new Event('admin-auth-change'));
       loadProjects();
     } else {
       alert('Access Denied');
@@ -96,8 +113,8 @@ export default function AdminPage() {
         <div className="flex gap-4">
           <button
             onClick={() => {
-              setIsAuthenticated(false);
               sessionStorage.removeItem('admin_auth');
+              window.dispatchEvent(new Event('admin-auth-change'));
             }}
             className="text-sm text-gray-400 hover:text-white"
           >
@@ -177,7 +194,7 @@ export default function AdminPage() {
                 <div className="flex items-center gap-4">
                   {editing.imageUrl && (
                     <div className="relative w-16 h-16 rounded overflow-hidden border border-white/20 group">
-                      <img src={editing.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                      <Image src={editing.imageUrl} alt="Preview" fill sizes="64px" className="object-cover" />
                       <button
                         type="button"
                         onClick={() => setEditing({ ...editing, imageUrl: '' })}

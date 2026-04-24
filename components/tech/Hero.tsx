@@ -1,24 +1,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Download, ExternalLink, ChevronDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Download, ExternalLink, ChevronDown, MessageSquare } from 'lucide-react';
 
 const statusData = {
   name: 'Larry',
-  role: 'Full Stack Engineer',
+  role: 'Full Stack Engineer & Systems Builder',
   focus: 'AI + Cloud Systems',
-  status: 'Building',
-  uptime: '99.99%',
+  status: 'Available for select builds',
+  uptime: '40% efficiency lift',
 };
 
 export function Hero() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
     <section className="relative min-h-[85vh] flex flex-col justify-center -mt-20 pt-20 mb-16">
       {/* Ambient glow */}
@@ -53,9 +46,8 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-gray-300 text-base md:text-lg leading-relaxed max-w-2xl font-light"
           >
-            I design and deploy scalable digital ecosystems. From AI-integrated applications
-            to cloud-native architectures, I build systems that operate reliably under
-            real-world pressure.
+            I help founders and teams ship AI-enabled products, modernize cloud platforms,
+            and build dependable systems that hold up in real-world production environments.
           </motion.p>
 
           <motion.div
@@ -74,11 +66,18 @@ export function Hero() {
               Download Resume
             </a>
             <a
-              href="/resume"
+              href="#contact"
               className="inline-flex items-center gap-2.5 px-6 py-3 border border-electric-cyan/30 text-electric-cyan font-bold text-sm rounded-lg hover:bg-electric-cyan/10 transition-all duration-300"
             >
+              <MessageSquare className="w-4 h-4" />
+              Start a Project
+            </a>
+            <a
+              href="#impact"
+              className="inline-flex items-center gap-2.5 px-6 py-3 border border-white/10 text-white font-bold text-sm rounded-lg hover:bg-white/5 transition-all duration-300"
+            >
               <ExternalLink className="w-4 h-4" />
-              View Resume
+              View Impact
             </a>
           </motion.div>
         </div>
@@ -108,7 +107,7 @@ export function Hero() {
                   <motion.p
                     key={key}
                     initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: mounted ? 1 : 0, x: mounted ? 0 : -10 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + i * 0.1 }}
                     className="pl-4"
                   >

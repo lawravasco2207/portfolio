@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ExternalLink, Github } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -22,7 +23,7 @@ export function TechProjects() {
         <span className="text-electric-cyan">{'>'}</span> REPOSITORIES
       </h3>
       <p className="text-sm text-gray-500 font-mono mb-8 ml-5">
-        // Open source & production deployments
+        {'// Open source & production deployments'}
       </p>
 
       <div className="grid grid-cols-1 gap-4">
@@ -53,9 +54,11 @@ export function TechProjects() {
 
                 {project.imageUrl && (
                   <div className="mb-4 h-32 w-full max-w-sm overflow-hidden rounded border border-electric-cyan/20">
-                    <img
+                    <Image
                       src={project.imageUrl}
                       alt={project.title}
+                      width={384}
+                      height={128}
                       className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                     />
                   </div>
