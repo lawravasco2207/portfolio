@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { sendEmail } from '@/app/actions';
 
 const HELP_TEXT = `Available commands:
@@ -150,7 +149,7 @@ export function TechTerminal() {
         <span className="text-electric-cyan">{'>'}</span> LIVE_TERMINAL
       </h3>
       <p className="text-sm text-gray-500 font-mono mb-8 ml-5">
-        // Interactive system interface
+        {'// Interactive system interface'}
       </p>
 
       <div className="relative bg-black/80 border border-electric-cyan/30 rounded-lg overflow-hidden shadow-[0_0_30px_rgba(0,229,255,0.08)]">

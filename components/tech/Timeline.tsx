@@ -33,7 +33,7 @@ export function TechTimeline() {
         <span className="text-electric-cyan">{'>'}</span> SYSTEM_LOGS
       </h3>
       <p className="text-sm text-gray-500 font-mono mb-8 ml-5">
-        // Experience timeline — outcome-focused
+        {'// Experience timeline — outcome-focused'}
       </p>
 
       <div className="relative border-l border-electric-cyan/20 ml-2 md:ml-4 space-y-8 md:space-y-12">

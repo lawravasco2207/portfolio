@@ -47,7 +47,7 @@ export default function ResumePage() {
           <div className="mb-4 flex items-center gap-2 text-xs text-gray-500">
             <div className="w-1.5 h-1.5 bg-electric-cyan rounded-full" />
             <span>RESUME_VIEWER</span>
-            <span className="text-gray-700">// Larry — Full Stack Engineer & Systems Architect</span>
+            <span className="text-gray-700">{'// Larry — Full Stack Engineer & Systems Architect'}</span>
           </div>
 
           {loadError ? (

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { getProjects, saveProject, deleteProject, verifyAdmin, getFeatured, saveFeatured, type Project, type FeaturedStartup } from '@/app/actions';
 import { Trash2, Plus, Save, Lock, Image as ImageIcon, Sparkles } from 'lucide-react';
@@ -11,13 +12,16 @@ export default function AdminPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [editing, setEditing] = useState<Project | null>(null);
   const [featured, setFeatured] = useState<FeaturedStartup | null>(null);
-  const [editingFeatured, setEditingFeatured] = useState(false);
   const [activeTab, setActiveTab] = useState<'projects' | 'featured'>('projects');
 
   useEffect(() => {
     if (sessionStorage.getItem('admin_auth') === 'true') {
-      setIsAuthenticated(true);
-      loadProjects();
+      const timeoutId = window.setTimeout(() => {
+        setIsAuthenticated(true);
+        loadProjects();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }
   }, []);
 
@@ -177,7 +181,7 @@ export default function AdminPage() {
                 <div className="flex items-center gap-4">
                   {editing.imageUrl && (
                     <div className="relative w-16 h-16 rounded overflow-hidden border border-white/20 group">
-                      <img src={editing.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                      <Image src={editing.imageUrl} alt="Preview" fill className="object-cover" />
                       <button
                         type="button"
                         onClick={() => setEditing({ ...editing, imageUrl: '' })}

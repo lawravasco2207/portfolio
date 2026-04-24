@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { SocialLinks } from '@/components/SocialLinks';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: 'Larry | Full Stack Engineer & Systems Architect',
   description:
     'Full Stack Engineering // AI Systems // Cloud Infrastructure. I help teams ship dependable products, cloud systems, and AI-enhanced workflows.',

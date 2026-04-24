@@ -41,7 +41,7 @@ export function ImpactSnapshot() {
           <span className="text-electric-cyan">{'>'}</span> IMPACT_VECTOR
         </h3>
         <p className="text-sm text-gray-500 font-mono mb-4 ml-5">
-          // Outcome-focused engineering value
+          {'// Outcome-focused engineering value'}
         </p>
         <p className="text-cyan-100/70 leading-relaxed text-sm md:text-base">
           The strongest portfolios do more than list tools. They show what changes after the

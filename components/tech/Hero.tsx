@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { Download, ExternalLink, ChevronDown, MessageSquare } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 const statusData = {
   name: 'Larry',
@@ -13,12 +12,6 @@ const statusData = {
 };
 
 export function Hero() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
     <section className="relative min-h-[85vh] flex flex-col justify-center -mt-20 pt-20 mb-16">
       {/* Ambient glow */}
@@ -114,7 +107,7 @@ export function Hero() {
                   <motion.p
                     key={key}
                     initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: mounted ? 1 : 0, x: mounted ? 0 : -10 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + i * 0.1 }}
                     className="pl-4"
                   >
