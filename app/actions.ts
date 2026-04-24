@@ -103,7 +103,47 @@ export async function deleteProject(id: string) {
   return { success: true };
 }
 
-export async function sendEmail(data: { email: string; message: string }) {
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+export async function sendEmail(data: {
+  name?: string;
+  company?: string;
+  email: string;
+  message: string;
+}) {
+  const email = data.email.trim();
+  const message = data.message.trim();
+  const name = data.name?.trim() || 'Terminal Visitor';
+  const company = data.company?.trim() || 'Not provided';
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { success: false, error: 'Please provide a valid email address.' };
+  }
+
+  if (name.length < 2) {
+    return { success: false, error: 'Please provide your name.' };
+  }
+
+  if (message.length < 10) {
+    return { success: false, error: 'Please add a little more detail to your message.' };
+  }
+
+  if (
+    !process.env.SMTP_HOST ||
+    !process.env.SMTP_PORT ||
+    !process.env.SMTP_USER ||
+    !process.env.SMTP_PASS
+  ) {
+    return { success: false, error: 'Contact service is not configured right now.' };
+  }
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
@@ -118,15 +158,17 @@ export async function sendEmail(data: { email: string; message: string }) {
     await transporter.sendMail({
       from: `"Portfolio Terminal" <${process.env.SMTP_USER}>`,
       to: 'syokslawrence@gmail.com',
-      subject: `New Transmission from ${data.email}`,
-      text: `IDENTITY: ${data.email}\nPAYLOAD:\n${data.message}`,
+      subject: `New Transmission from ${name} (${email})`,
+      text: `IDENTITY: ${name}\nEMAIL: ${email}\nORGANIZATION: ${company}\nPAYLOAD:\n${message}`,
       html: `
         <div style="font-family: monospace; background: #000; color: #00E5FF; padding: 20px;">
           <h2>/// INCOMING TRANSMISSION ///</h2>
-          <p><strong>IDENTITY:</strong> ${data.email}</p>
+          <p><strong>IDENTITY:</strong> ${escapeHtml(name)}</p>
+          <p><strong>EMAIL:</strong> ${escapeHtml(email)}</p>
+          <p><strong>ORGANIZATION:</strong> ${escapeHtml(company)}</p>
           <hr style="border-color: #005BCE;" />
           <p><strong>PAYLOAD:</strong></p>
-          <pre style="white-space: pre-wrap; color: #fff;">${data.message}</pre>
+          <pre style="white-space: pre-wrap; color: #fff;">${escapeHtml(message)}</pre>
         </div>
       `,
     });
