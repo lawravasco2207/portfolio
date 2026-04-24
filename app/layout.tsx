@@ -12,7 +12,9 @@ function getMetadataBase() {
     if (url.protocol === 'http:' || url.protocol === 'https:') {
       return url;
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Invalid NEXT_PUBLIC_SITE_URL; falling back to localhost.', error);
+  }
 
   return new URL(fallbackUrl);
 }

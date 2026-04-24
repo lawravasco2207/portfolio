@@ -7,7 +7,7 @@ const impactSignals = [
   {
     icon: Gauge,
     label: 'Operational lift',
-    title: 'Reduced resource idle time by 40% in beta trials',
+    title: 'Reduced resource idle time by 40% in PlanMorph beta trials',
     description:
       'I focus on bottlenecks that slow teams down, then turn them into measurable workflow gains.',
   },

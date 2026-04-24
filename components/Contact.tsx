@@ -42,7 +42,7 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-20 px-4 flex justify-center scroll-mt-24">
+    <section id="contact" aria-label="Contact form" className="py-20 px-4 flex justify-center scroll-mt-24">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         whileInView={{ opacity: 1, scale: 1 }}
