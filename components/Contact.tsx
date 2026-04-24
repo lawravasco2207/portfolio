@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, Send } from 'lucide-react';
+import { Github, Linkedin, Mail, Send, Twitter } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { sendEmail } from '@/app/actions';
 
@@ -104,6 +104,21 @@ export function Contact() {
                 <div>
                   <div className="text-xs text-gray-500 font-mono">CODEBASE</div>
                   <div className="text-white font-bold">github.com/lawravasco2207</div>
+                </div>
+              </a>
+
+              <a
+                href="https://x.com/lawravasco"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-electric-cyan/50 transition-all group/item"
+              >
+                <div className="p-3 bg-electric-cyan/10 rounded-full text-electric-cyan group-hover/item:scale-110 transition-transform">
+                  <Twitter className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 font-mono">LIVE_FEED</div>
+                  <div className="text-white font-bold">x.com/lawravasco</div>
                 </div>
               </a>
             </div>
