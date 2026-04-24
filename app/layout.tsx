@@ -12,9 +12,7 @@ function getMetadataBase() {
     if (url.protocol === 'http:' || url.protocol === 'https:') {
       return url;
     }
-  } catch {
-    return new URL(fallbackUrl);
-  }
+  } catch {}
 
   return new URL(fallbackUrl);
 }

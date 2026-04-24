@@ -123,7 +123,23 @@ export async function sendEmail(data: {
   const name = data.name?.trim() || 'Terminal Visitor';
   const company = data.company?.trim() || 'Not provided';
 
-  if (!email || !email.includes('@') || email.length > 254) {
+  const emailParts = email.split('@');
+  const emailLocalPart = emailParts[0];
+  const emailDomain = emailParts[1];
+
+  if (
+    !email ||
+    email.length > 254 ||
+    /\s/.test(email) ||
+    emailParts.length !== 2 ||
+    !emailLocalPart ||
+    !emailDomain ||
+    emailLocalPart.startsWith('.') ||
+    emailLocalPart.endsWith('.') ||
+    emailDomain.startsWith('.') ||
+    emailDomain.endsWith('.') ||
+    !emailDomain.includes('.')
+  ) {
     return { success: false, error: 'Please provide a valid email address.' };
   }
 
