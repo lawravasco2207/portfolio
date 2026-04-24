@@ -7,7 +7,13 @@ import { Trash2, Plus, Save, Lock, Image as ImageIcon, Sparkles } from 'lucide-r
 import { TagInput } from '@/components/admin/TagInput';
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return window.sessionStorage.getItem('admin_auth') === 'true';
+  });
   const [password, setPassword] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [editing, setEditing] = useState<Project | null>(null);
@@ -15,15 +21,10 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'projects' | 'featured'>('projects');
 
   useEffect(() => {
-    if (sessionStorage.getItem('admin_auth') === 'true') {
-      const timeoutId = window.setTimeout(() => {
-        setIsAuthenticated(true);
-        loadProjects();
-      }, 0);
-
-      return () => window.clearTimeout(timeoutId);
+    if (isAuthenticated) {
+      loadProjects();
     }
-  }, []);
+  }, [isAuthenticated]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();

@@ -2,10 +2,25 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { SocialLinks } from '@/components/SocialLinks';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+function getMetadataBase() {
+  const fallbackUrl = 'http://localhost:3000';
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL ?? fallbackUrl;
+
+  try {
+    const url = new URL(configuredUrl);
+
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return url;
+    }
+  } catch {
+    return new URL(fallbackUrl);
+  }
+
+  return new URL(fallbackUrl);
+}
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: getMetadataBase(),
   title: 'Larry | Full Stack Engineer & Systems Architect',
   description:
     'Full Stack Engineering // AI Systems // Cloud Infrastructure. I help teams ship dependable products, cloud systems, and AI-enhanced workflows.',
