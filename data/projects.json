@@ -1,12 +1,26 @@
 [
   {
-    "id": "4",
-    "title": "PlanMorph",
-    "description": "AI-powered SaaS for engineering project management. Predictive analytics, automated resource allocation, and intelligent workflow automation.",
-    "stack": ["Next.js", "TypeScript", "PostgreSQL", "AI APIs", "Docker", "DigitalOcean"],
-    "link": "https://tech.planmorph.software/",
-    "githubLink": "https://github.com/code-nexus-342/planmorph-tech",
-    "mode": "tech",
-    "imageUrl": "/uploads/1764671005326-297111195-planmorph.jpg"
+    "id": "vex",
+    "title": "Vex",
+    "description": "Semantic version control for BIM and IFC models, built around meaningful model diffs instead of file-level noise.",
+    "stack": ["Rust", "IFC", "STEP Part 21", "Merkle hashing", "redb", "GitHub Actions"],
+    "githubLink": "https://github.com/PlanMorph-Org/vex",
+    "mode": "tech"
+  },
+  {
+    "id": "vex-bridge",
+    "title": "vex-bridge",
+    "description": "Local daemon and API bridge that lets CAD integrations push BIM data through secure localhost workflows.",
+    "stack": ["Rust", "C#", "Python", "HTTP daemon", "OS keychain", "Windows installer"],
+    "githubLink": "https://github.com/PlanMorph-Org/vex-bridge",
+    "mode": "tech"
+  },
+  {
+    "id": "vex-atlas",
+    "title": "Vex Atlas",
+    "description": "Cloud system that manages users' actions on Vex: repository metadata, auth, SSH key registry, device pairing, vex-serve callbacks, and browser semantic diff review.",
+    "stack": ["ASP.NET Core 8", "C#", "PostgreSQL", "EF Core", "Next.js", "TypeScript", "HMAC callbacks"],
+    "githubLink": "https://github.com/Planmorph-Org/architur",
+    "mode": "tech"
   }
 ]

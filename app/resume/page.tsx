@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Download, ArrowLeft, ExternalLink, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ResumePage() {
@@ -19,7 +19,7 @@ export default function ResumePage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Portfolio
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-3">
             <a
               href="/assets/resume.pdf"
               target="_blank"
@@ -27,7 +27,15 @@ export default function ResumePage() {
               className="flex items-center gap-2 px-4 py-2 text-sm border border-electric-cyan/30 text-electric-cyan rounded-lg hover:bg-electric-cyan/10 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              Open in New Tab
+              Open PDF
+            </a>
+            <a
+              href="/assets/LawrenceMusyoka_Resume.docx"
+              download
+              className="flex items-center gap-2 px-4 py-2 text-sm border border-white/15 text-white rounded-lg hover:bg-white/5 transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              DOCX Source
             </a>
             <a
               href="/assets/resume.pdf"
@@ -47,7 +55,17 @@ export default function ResumePage() {
           <div className="mb-4 flex items-center gap-2 text-xs text-gray-500">
             <div className="w-1.5 h-1.5 bg-electric-cyan rounded-full" />
             <span>RESUME_VIEWER</span>
-            <span className="text-gray-700">{'// Larry — Full Stack Engineer & Systems Architect'}</span>
+            <span className="text-gray-700">{'// Lawrence Musyoka — Mission Control document surface'}</span>
+          </div>
+
+          <div className="mb-4 rounded-lg border border-white/10 bg-black/40 p-4 text-sm text-gray-400">
+            <div className="mb-2 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-electric-cyan">
+              <FileText className="h-4 w-4" />
+              document routing
+            </div>
+            <p>
+              PDF is used for the browser viewer. The new DOCX resume source is available as a direct download for systems that need the editable document.
+            </p>
           </div>
 
           {loadError ? (

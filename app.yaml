@@ -38,3 +38,6 @@ services:
   - key: DO_SPACES_ENDPOINT
     scope: RUN_TIME
     type: SECRET
+  - key: GITHUB_TOKEN
+    scope: RUN_TIME
+    type: SECRET

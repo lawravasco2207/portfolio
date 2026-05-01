@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Layers, Brain, Cloud, Network, Container, Workflow,
+  Brain, Cloud, Container, Layers, Network, Workflow,
 } from 'lucide-react';
+import type { CapabilityConfig } from '@/lib/mission-control/types';
 
 const capabilities = [
   {
@@ -39,25 +41,51 @@ const capabilities = [
 ];
 
 export function CapabilitiesMatrix() {
+  const [liveCapabilities, setLiveCapabilities] = useState<CapabilityConfig[] | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetch('/api/changelog')
+      .then((response) => response.json())
+      .then((data) => {
+        if (mounted) setLiveCapabilities(data.capabilities);
+      })
+      .catch(() => {
+        if (mounted) setLiveCapabilities(null);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const items = liveCapabilities?.map((capability, index) => ({
+    icon: capabilities[index % capabilities.length].icon,
+    title: capability.label,
+    modules: capability.modules,
+    source: capability.source,
+  })) || capabilities.map((capability) => ({ ...capability, source: 'local fallback' }));
+
   return (
     <section className="mb-20">
       <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2 mb-2 font-mono">
         <span className="text-electric-cyan">{'>'}</span> CAPABILITIES_MATRIX
       </h3>
       <p className="text-sm text-gray-500 font-mono mb-8 ml-5">
-        {'// Production-grade modules loaded'}
+        {'// Active modules sourced from /api/changelog'}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {capabilities.map((cap, index) => (
+        {items.map((cap, index) => (
           <motion.div
             key={cap.title}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.4, delay: index * 0.08 }}
-            whileHover={{ borderColor: 'rgba(0, 229, 255, 0.5)', y: -2 }}
-            className="group relative bg-black/40 border border-electric-cyan/15 rounded-lg p-5 backdrop-blur-sm transition-all duration-300 hover:bg-black/60"
+            whileHover={{ y: -2 }}
+            className="group relative bg-black/35 border border-white/10 rounded-lg p-5 backdrop-blur-sm transition-all duration-300 hover:bg-black/60 hover:border-electric-cyan/35"
           >
             {/* Corner accent */}
             <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-electric-cyan/20 rounded-tr-lg opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -79,9 +107,9 @@ export function CapabilitiesMatrix() {
             </ul>
 
             <div className="mt-4 pt-3 border-t border-white/5">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-start gap-1.5">
                 <div className="w-1.5 h-1.5 bg-green-400 rounded-full" />
-                <span className="text-[10px] text-green-400/70 font-mono uppercase tracking-wider">Module Active</span>
+                <span className="text-[10px] text-green-400/70 font-mono uppercase tracking-wider leading-relaxed">{cap.source}</span>
               </div>
             </div>
           </motion.div>

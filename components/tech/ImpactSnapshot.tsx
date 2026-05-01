@@ -7,9 +7,9 @@ const impactSignals = [
   {
     icon: Gauge,
     label: 'Operational lift',
-    title: 'Reduced resource idle time by 40% in PlanMorph beta trials',
+    title: 'Vex turns BIM model changes into inspectable semantic signals',
     description:
-      'I focus on bottlenecks that slow teams down, then turn them into measurable workflow gains.',
+      'I focus on the places where engineering teams lose context, then turn that ambiguity into traceable system output.',
   },
   {
     icon: Cloud,
@@ -44,8 +44,8 @@ export function ImpactSnapshot() {
           {'// Outcome-focused engineering value'}
         </p>
         <p className="text-cyan-100/70 leading-relaxed text-sm md:text-base">
-          The strongest portfolios do more than list tools. They show what changes after the
-          work is delivered, who benefits, and where the engineering effort creates leverage.
+          The interface above is the public control room. These are the operating outcomes behind it:
+          measurable lift, reliable delivery, and AI applied where it changes execution.
         </p>
       </div>
 
@@ -58,8 +58,8 @@ export function ImpactSnapshot() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
-              whileHover={{ y: -4, borderColor: 'rgba(0, 229, 255, 0.45)' }}
-              className="rounded-2xl border border-electric-cyan/15 bg-white/[0.03] p-5 backdrop-blur-sm transition-all duration-300"
+              whileHover={{ y: -4 }}
+              className="rounded-lg border border-white/10 bg-black/35 p-5 backdrop-blur-sm transition-all duration-300"
             >
               <div className="mb-4 inline-flex rounded-lg border border-electric-cyan/20 bg-electric-cyan/10 p-2 text-electric-cyan">
                 <signal.icon className="w-5 h-5" />
@@ -77,7 +77,7 @@ export function ImpactSnapshot() {
           initial={{ opacity: 0, x: 24 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          className="rounded-2xl border border-electric-cyan/15 bg-gradient-to-br from-electric-cyan/10 via-white/[0.03] to-transparent p-6"
+          className="rounded-lg border border-white/10 bg-black/35 p-6"
         >
           <p className="text-[11px] uppercase tracking-[0.24em] text-cyan-300/60 font-mono mb-3">
             best fit engagements

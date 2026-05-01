@@ -6,9 +6,9 @@ const experience = [
   {
     year: '2024 — Present',
     role: 'Founder & Lead Engineer',
-    company: 'PlanMorph',
-    desc: 'Architecting an AI-driven SaaS platform for engineering project management. Designing cloud-native infrastructure on DigitalOcean, building full-stack features with Next.js and PostgreSQL, and integrating AI APIs for predictive project analytics.',
-    tags: ['Next.js', 'PostgreSQL', 'AI APIs', 'DigitalOcean', 'Docker'],
+    company: 'Vex Systems',
+    desc: 'Building semantic tooling for BIM and IFC workflows, with Vex as the core diff engine and vex-bridge as the local integration surface for CAD environments.',
+    tags: ['Rust', 'IFC', 'Vex', 'vex-bridge', 'GitHub Releases'],
   },
   {
     year: '2023 — 2024',

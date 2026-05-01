@@ -2,44 +2,39 @@
 
 import { motion } from 'framer-motion';
 import { Footer } from '@/components/Footer';
+import { LiveClock } from '@/components/mission-control/LiveClock';
 
 export function TechLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-black text-white relative font-mono selection:bg-electric-cyan selection:text-black">
-      {/* Cyber Grid Background */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-electric-cyan/5 to-transparent blur-3xl" />
+    <div className="relative min-h-screen overflow-hidden bg-black text-white selection:bg-electric-cyan selection:text-black">
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-30">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,229,255,0.025)_50%)] bg-[size:100%_5px]" />
       </div>
 
-      {/* Content Container */}
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-black/80 backdrop-blur-xl">
+        <div className="container mx-auto flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <a href="#top" className="font-mono text-lg font-black tracking-tight text-white">
+            MISSION<span className="text-electric-cyan">_CONTROL</span>
+          </a>
+          <nav className="flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em] text-gray-500 sm:justify-end">
+            <a href="#impact" className="transition-colors hover:text-electric-cyan">Impact</a>
+            <a href="#about" className="transition-colors hover:text-electric-cyan">API</a>
+            <a href="#projects" className="transition-colors hover:text-electric-cyan">Artifacts</a>
+            <a href="#contact" className="transition-colors hover:text-electric-cyan">Contact</a>
+            <span className="hidden text-gray-700 sm:inline">/</span>
+            <LiveClock />
+          </nav>
+        </div>
+      </header>
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="relative z-10 container mx-auto px-4 py-20"
+        id="top"
+        className="relative z-10 container mx-auto px-4 py-8 md:py-12"
       >
-        <header className="mb-12 border-b border-electric-cyan/30 pb-4 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
-          <div>
-            <h2 className="text-3xl font-bold text-electric-cyan tracking-tighter">
-              SYSTEM_OVERRIDE
-            </h2>
-            <p className="text-sm text-cyan-300/70 mt-2 font-mono">
-              Full Stack Engineering // AI Systems // Cloud Infrastructure
-            </p>
-          </div>
-          <div className="flex gap-6 font-mono text-xs text-cyan-500/50">
-            <div className="text-right">
-              <div>UPTIME: <span className="text-green-400">99.99%</span></div>
-              <div>LATENCY: <span className="text-yellow-300">12ms</span></div>
-            </div>
-            <div className="text-right">
-              <div>BUILD: <span className="text-electric-cyan">stable</span></div>
-              <div>DEPLOY: <span className="text-green-400">active</span></div>
-            </div>
-          </div>
-        </header>
-
         {children}
       </motion.div>
 

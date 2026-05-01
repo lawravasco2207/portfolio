@@ -1,0 +1,95 @@
+{
+  "profile": {
+    "name": "Lawrence Musyoka",
+    "handle": "Larry",
+    "role": "Full Stack Engineer & Systems Builder",
+    "location": "Nairobi, Kenya",
+    "timezone": "Africa/Nairobi",
+    "availability": "Available for select builds",
+    "thesis": "I build production systems that turn engineering ambition into operating leverage.",
+    "summary": "Founder-minded full stack engineer focused on AI-enabled products, cloud infrastructure, BIM-adjacent workflows, and reliable delivery systems.",
+    "focus": [
+      "AI-enabled product systems",
+      "Cloud-native deployment",
+      "Engineering workflow automation",
+      "Operational dashboards and internal tools"
+    ],
+    "links": {
+      "github": "https://github.com/lawravasco2207",
+      "linkedin": "https://www.linkedin.com/in/lawrence-musyoka-b58a1836a/",
+      "email": "mailto:syokslawrence@gmail.com",
+      "resume": "/resume"
+    }
+  },
+  "repositories": [
+    {
+      "id": "vex",
+      "owner": "PlanMorph-Org",
+      "name": "vex",
+      "label": "Vex",
+      "role": "Semantic diff engine",
+      "description": "Core engine work for semantic model comparison and engineering artifact intelligence."
+    },
+    {
+      "id": "vex-bridge",
+      "owner": "PlanMorph-Org",
+      "name": "vex-bridge",
+      "label": "vex-bridge",
+      "role": "Local API bridge",
+      "description": "Local API bridge layer for connecting Vex capabilities to desktop and workflow surfaces."
+    },
+    {
+      "id": "vex-atlas",
+      "owner": "Planmorph-Org",
+      "name": "vex-atlas",
+      "githubName": "architur",
+      "label": "Vex Atlas",
+      "role": "Cloud action manager",
+      "description": "Cloud platform for Vex: manages users, repositories, SSH keys, device pairing, vex-serve callbacks, and browser semantic diff review."
+    }
+  ],
+  "services": [],
+  "capabilities": [
+    {
+      "id": "full-stack",
+      "label": "Full Stack Architecture",
+      "source": "Vex tooling + portfolio control surface",
+      "modules": ["Next.js", "React", "TypeScript", "Node.js", ".NET", "PostgreSQL"]
+    },
+    {
+      "id": "ai-systems",
+      "label": "AI Systems Engineering",
+      "source": "Vex automation research + agent workflow prototypes",
+      "modules": ["AI APIs", "LLM workflows", "Prompt systems", "Predictive planning"]
+    },
+    {
+      "id": "cloud-delivery",
+      "label": "Cloud Delivery",
+      "source": "Vex Atlas API + web platform",
+      "modules": ["ASP.NET Core", "PostgreSQL", "Next.js", "JWT auth", "Device pairing"]
+    },
+    {
+      "id": "bim-automation",
+      "label": "BIM Workflow Automation",
+      "source": "Vex + construction-domain systems thinking",
+      "modules": ["IFC semantics", "Diff workflows", "Local APIs", "Engineering data models"]
+    }
+  ],
+  "changelog": [
+    {
+      "date": "2026",
+      "title": "Vex systems became the live artifact focus",
+      "description": "The portfolio live surface centers Vex, vex-bridge, and Vex Atlas as the active source systems worth inspecting."
+    },
+    {
+      "date": "2025",
+      "title": "Vex and vex-bridge entered active build mode",
+      "description": "Semantic diff and local bridge work became part of the broader engineering artifact intelligence layer."
+    },
+    {
+      "date": "2024",
+      "title": "AEC systems work moved into production-oriented execution",
+      "description": "Construction-domain tooling became the primary founder and systems-building track behind Vex."
+    }
+  ]
+}

@@ -2,6 +2,8 @@
 
 import nodemailer from 'nodemailer';
 import { getJSON, putJSON, uploadFile } from '@/lib/spaces';
+import localFeatured from '@/data/featured.json';
+import localProjects from '@/data/projects.json';
 
 const PROJECTS_KEY = 'data/projects.json';
 const FEATURED_KEY = 'data/featured.json';
@@ -19,10 +21,11 @@ export interface FeaturedStartup {
 
 export async function getFeatured(): Promise<FeaturedStartup | null> {
   try {
-    return await getJSON<FeaturedStartup>(FEATURED_KEY);
+    const data = await getJSON<FeaturedStartup>(FEATURED_KEY);
+    return data ?? (localFeatured as FeaturedStartup);
   } catch (error) {
     console.error('Failed to read featured:', error);
-    return null;
+    return localFeatured as FeaturedStartup;
   }
 }
 
@@ -75,10 +78,10 @@ export async function uploadImage(formData: FormData) {
 export async function getProjects(): Promise<Project[]> {
   try {
     const data = await getJSON<Project[]>(PROJECTS_KEY);
-    return data ?? [];
+    return data ?? (localProjects as Project[]);
   } catch (error) {
     console.error('Failed to read projects:', error);
-    return [];
+    return localProjects as Project[];
   }
 }
 

@@ -1,10 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Terminal, Cpu, Network, Cloud, Code2, Rocket } from 'lucide-react';
+import { Braces, Cloud, Code2, Cpu, Network, Rocket } from 'lucide-react';
+import type { MissionProfile } from '@/lib/mission-control/types';
 
 const highlights = [
-  { icon: Terminal, label: 'Full Stack', desc: 'End-to-end systems' },
+  { icon: Braces, label: 'Full Stack', desc: 'End-to-end systems' },
   { icon: Cpu, label: 'AI Integration', desc: 'Intelligent workflows' },
   { icon: Cloud, label: 'Cloud Architecture', desc: 'Scalable infra' },
   { icon: Network, label: 'Distributed', desc: 'High-availability' },
@@ -13,35 +15,52 @@ const highlights = [
 ];
 
 export function TechAboutMe() {
+  const [profile, setProfile] = useState<MissionProfile | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetch('/api/profile')
+      .then((response) => response.json())
+      .then((data) => {
+        if (mounted) setProfile(data.profile);
+      })
+      .catch(() => {
+        if (mounted) setProfile(null);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mb-12 md:mb-20">
+    <section id="about" className="grid scroll-mt-24 grid-cols-1 gap-8 md:gap-12 lg:grid-cols-[0.9fr_1.1fr] mb-12 md:mb-20">
       <div className="space-y-6">
         <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2 font-mono">
-          <span className="text-electric-cyan">{'>'}</span> WHOAMI
+          <span className="text-electric-cyan">{'>'}</span> /api/profile
         </h3>
-        <p className="text-cyan-100/80 leading-relaxed font-light text-sm md:text-base">
-          I am a full-stack software engineer and systems builder. I design and deploy
-          scalable, production-ready systems with a focus on high-availability architectures,
-          distributed systems, and AI-enhanced workflows.
+        <p className="text-cyan-100/80 leading-relaxed text-sm md:text-base">
+          {profile?.summary ||
+            'Founder-minded full stack engineer focused on AI-enabled products, cloud infrastructure, BIM-adjacent workflows, and reliable delivery systems.'}
         </p>
-        <p className="text-cyan-100/60 leading-relaxed font-light text-sm md:text-base">
-          My stack spans <span className="text-electric-cyan">Python</span>,{' '}
-          <span className="text-electric-cyan">C# / .NET</span>,{' '}
-          <span className="text-electric-cyan">React / Next.js</span>,{' '}
-          <span className="text-electric-cyan">TypeScript</span>,{' '}
-          <span className="text-electric-cyan">Node.js</span>, and{' '}
-          <span className="text-electric-cyan">PostgreSQL</span> — deployed via{' '}
-          <span className="text-electric-cyan">Docker</span> on{' '}
-          <span className="text-electric-cyan">Azure</span>,{' '}
-          <span className="text-electric-cyan">DigitalOcean</span>, and{' '}
-          <span className="text-electric-cyan">AWS</span>.
-        </p>
-        <p className="text-cyan-100/60 leading-relaxed font-light text-sm md:text-base">
-          Currently building{' '}
-          <span className="text-electric-cyan font-bold">PlanMorph</span> — an AI-powered
-          SaaS platform for engineering project management. I think like a founder, build
-          like an engineer, and care about systems that work, scale, and last.
-        </p>
+        <div className="rounded-lg border border-white/10 bg-black/35 p-4 font-mono text-xs text-gray-400">
+          <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3 text-electric-cyan">
+            <Braces className="h-4 w-4" />
+            profile.response.json
+          </div>
+          <pre className="overflow-x-auto whitespace-pre-wrap leading-relaxed">
+{JSON.stringify(
+  profile || {
+    name: 'Lawrence Musyoka',
+    role: 'Full Stack Engineer & Systems Builder',
+    status: 'syncing profile endpoint',
+  },
+  null,
+  2,
+)}
+          </pre>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -52,7 +71,7 @@ export function TechAboutMe() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            whileHover={{ scale: 1.03, borderColor: 'rgba(0, 229, 255, 0.5)' }}
+            whileHover={{ scale: 1.03 }}
             className="p-4 border border-electric-cyan/15 bg-electric-cyan/5 rounded-lg backdrop-blur-sm transition-all duration-300 cursor-default"
           >
             <item.icon className="w-5 h-5 text-electric-cyan mb-2" />

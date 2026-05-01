@@ -5,26 +5,66 @@ import { motion } from 'framer-motion';
 import { ExternalLink, Github } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getProjects, type Project } from '@/app/actions';
+import type { MissionControlPayload, RepoTelemetry } from '@/lib/mission-control/types';
 
 export function TechProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [repositories, setRepositories] = useState<RepoTelemetry[]>([]);
 
   useEffect(() => {
     getProjects().then((data) => {
-      setProjects(data.filter((p) => p.mode === 'tech'));
+      setProjects(
+        data.filter((project) => {
+          const title = project.title.toLowerCase();
+          return project.mode === 'tech' && (title.includes('vex') || title.includes('bridge') || title.includes('atlas'));
+        }),
+      );
     });
+    fetch('/api/mission-control')
+      .then((response) => response.json())
+      .then((payload: MissionControlPayload) => setRepositories(payload.repositories))
+      .catch(() => setRepositories([]));
   }, []);
 
-  if (projects.length === 0) return null;
+  if (projects.length === 0 && repositories.length === 0) return null;
 
   return (
-    <section className="mb-20">
+    <section id="projects" className="mb-20 scroll-mt-24">
       <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2 mb-2 font-mono">
-        <span className="text-electric-cyan">{'>'}</span> REPOSITORIES
+        <span className="text-electric-cyan">{'>'}</span> RUNNING_ARTIFACTS
       </h3>
       <p className="text-sm text-gray-500 font-mono mb-8 ml-5">
-        {'// Open source & production deployments'}
+        {'// Vex engine, bridge, and cloud action manager'}
       </p>
+
+      {repositories.length > 0 && (
+        <div className="mb-6 grid grid-cols-1 gap-3 lg:grid-cols-3">
+          {repositories.map((repo) => (
+            <a
+              key={repo.id}
+              href={repo.htmlUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-white/10 bg-black/35 p-4 transition-colors hover:border-electric-cyan/35 hover:bg-white/[0.04]"
+            >
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <h4 className="font-bold text-white">{repo.label}</h4>
+                <span className={`rounded border px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${repo.status === 'live' ? 'border-green-400/30 text-green-300' : 'border-amber-300/30 text-amber-200'}`}>
+                  {repo.status}
+                </span>
+              </div>
+              <p className="min-h-16 text-sm leading-relaxed text-gray-400">{repo.description}</p>
+              <div className="mt-4 flex flex-wrap gap-2 font-mono text-[11px] text-gray-500">
+                <span>{repo.language || 'multi-stack'}</span>
+                <span>/</span>
+                <span>{repo.releaseCount} releases</span>
+                <span>/</span>
+                <span>{repo.openIssues} open issues</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4">
         {projects.map((project, index) => (
@@ -34,7 +74,7 @@ export function TechProjects() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
-            whileHover={{ borderColor: 'rgba(0, 229, 255, 0.5)' }}
+            whileHover={{ x: 2 }}
             className="group relative border-l-2 border-electric-cyan/30 bg-white/5 p-6 transition-all duration-300 hover:bg-white/[0.08] rounded-r-lg"
           >
             <div className="flex justify-between items-start">

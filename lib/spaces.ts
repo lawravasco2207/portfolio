@@ -16,11 +16,25 @@ const spacesClient = new S3Client({
 
 const BUCKET = process.env.DO_SPACES_BUCKET!;
 
+function hasSpacesConfig() {
+  return Boolean(
+    process.env.DO_SPACES_ENDPOINT &&
+      process.env.DO_SPACES_REGION &&
+      process.env.DO_SPACES_KEY &&
+      process.env.DO_SPACES_SECRET &&
+      process.env.DO_SPACES_BUCKET,
+  );
+}
+
 /**
  * Read a JSON file from DigitalOcean Spaces.
  * Returns parsed JSON or null if the key doesn't exist.
  */
 export async function getJSON<T>(key: string): Promise<T | null> {
+  if (!hasSpacesConfig()) {
+    return null;
+  }
+
   try {
     const command = new GetObjectCommand({ Bucket: BUCKET, Key: key });
     const response = await spacesClient.send(command);
@@ -39,6 +53,10 @@ export async function getJSON<T>(key: string): Promise<T | null> {
  * Write a JSON value to DigitalOcean Spaces.
  */
 export async function putJSON<T>(key: string, data: T): Promise<void> {
+  if (!hasSpacesConfig()) {
+    throw new Error('DigitalOcean Spaces is not configured.');
+  }
+
   const command = new PutObjectCommand({
     Bucket: BUCKET,
     Key: key,
@@ -58,6 +76,10 @@ export async function uploadFile(
   buffer: Buffer,
   contentType: string,
 ): Promise<string> {
+  if (!hasSpacesConfig()) {
+    throw new Error('DigitalOcean Spaces is not configured.');
+  }
+
   const command = new PutObjectCommand({
     Bucket: BUCKET,
     Key: key,
