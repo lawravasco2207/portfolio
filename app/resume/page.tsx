@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
 import { Download, ArrowLeft, ExternalLink, FileText } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
-export default function ResumePage() {
-  const [loadError, setLoadError] = useState(false);
+const resumePages = [
+  { src: '/assets/resume-page-1.png', alt: 'Lawrence Musyoka resume page 1' },
+  { src: '/assets/resume-page-2.png', alt: 'Lawrence Musyoka resume page 2' },
+];
 
+export default function ResumePage() {
   return (
     <div className="min-h-screen bg-black text-white font-mono">
       {/* Header */}
@@ -49,7 +52,7 @@ export default function ResumePage() {
         </div>
       </div>
 
-      {/* PDF Viewer */}
+      {/* Resume Preview */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-4 flex items-center gap-2 text-xs text-gray-500">
@@ -64,37 +67,47 @@ export default function ResumePage() {
               document routing
             </div>
             <p>
-              PDF is used for the browser viewer. The new DOCX resume source is available as a direct download for systems that need the editable document.
+              Resume pages are rendered directly below for reliable viewing. PDF and DOCX versions remain available for download.
             </p>
           </div>
 
-          {loadError ? (
-            <div className="border border-electric-cyan/20 rounded-lg bg-black/40 p-12 text-center">
-              <p className="text-gray-400 mb-4">
-                Resume PDF not found. Upload your resume to{' '}
-                <code className="text-electric-cyan bg-electric-cyan/10 px-2 py-0.5 rounded">
-                  /public/assets/resume.pdf
-                </code>
-              </p>
+          <div className="space-y-6">
+            {resumePages.map((page, index) => (
+              <div
+                key={page.src}
+                className="scroll-mt-28 overflow-hidden rounded-lg border border-electric-cyan/20 bg-white shadow-[0_0_35px_rgba(0,229,255,0.08)]"
+              >
+                <Image
+                  src={page.src}
+                  alt={page.alt}
+                  width={1191}
+                  height={1684}
+                  priority={index === 0}
+                  className="h-auto w-full"
+                />
+              </div>
+            ))}
+
+            <div className="flex flex-wrap items-center justify-center gap-3 rounded-lg border border-white/10 bg-black/40 p-4">
+              <a
+                href="/assets/resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-electric-cyan/30 px-4 py-2 text-sm text-electric-cyan transition-colors hover:bg-electric-cyan/10"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Open PDF
+              </a>
               <a
                 href="/assets/resume.pdf"
                 download
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm border border-electric-cyan/30 text-electric-cyan rounded-lg hover:bg-electric-cyan/10 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-electric-cyan px-4 py-2 text-sm font-bold text-deep-charcoal transition-colors hover:bg-cyan-300"
               >
                 <Download className="w-4 h-4" />
-                Try Download Anyway
+                Download PDF
               </a>
             </div>
-          ) : (
-            <div className="border border-electric-cyan/20 rounded-lg overflow-hidden bg-white">
-              <iframe
-                src="/assets/resume.pdf"
-                className="w-full h-[80vh]"
-                title="Resume - Larry"
-                onError={() => setLoadError(true)}
-              />
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
