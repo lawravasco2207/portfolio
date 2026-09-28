@@ -37,7 +37,7 @@ function getHeaders() {
   const headers: HeadersInit = {
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'lawrence-musyoka-mission-control',
+    'User-Agent': 'lawrence-musyoka-portfolio',
   };
 
   if (process.env.GITHUB_TOKEN) {
@@ -50,6 +50,7 @@ function getHeaders() {
 async function githubFetch<T>(path: string): Promise<T> {
   const response = await fetch(`${GITHUB_API}${path}`, {
     headers: getHeaders(),
+    signal: AbortSignal.timeout(6000),
     next: { revalidate: 120 },
   });
 

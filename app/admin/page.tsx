@@ -1,31 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState, useSyncExternalStore } from 'react';
-import { getProjects, saveProject, deleteProject, verifyAdmin, getFeatured, saveFeatured, type Project, type FeaturedStartup } from '@/app/actions';
+import { useEffect, useState } from 'react';
+import { getProjects, saveProject, deleteProject, verifyAdmin, getAdminSession, logoutAdmin, uploadImage, getFeatured, saveFeatured, type Project, type FeaturedStartup } from '@/app/actions';
 import { Trash2, Plus, Save, Lock, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { TagInput } from '@/components/admin/TagInput';
 
-function subscribeToAdminAuth(callback: () => void) {
-  window.addEventListener('storage', callback);
-  window.addEventListener('admin-auth-change', callback);
-
-  return () => {
-    window.removeEventListener('storage', callback);
-    window.removeEventListener('admin-auth-change', callback);
-  };
-}
-
-function getAdminAuthSnapshot() {
-  return window.sessionStorage.getItem('admin_auth') === 'true';
-}
-
 export default function AdminPage() {
-  const isAuthenticated = useSyncExternalStore(
-    subscribeToAdminAuth,
-    getAdminAuthSnapshot,
-    () => false,
-  );
+  const [authStatus, setAuthStatus] = useState<'checking' | 'authenticated' | 'signed-out'>('checking');
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [editing, setEditing] = useState<Project | null>(null);
@@ -33,43 +18,105 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'projects' | 'featured'>('projects');
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadProjects();
-    }
-  }, [isAuthenticated]);
+    let cancelled = false;
+    getAdminSession().then((session) => {
+      if (!cancelled) setAuthStatus(session.authenticated ? 'authenticated' : 'signed-out');
+    }).catch(() => {
+      if (cancelled) return;
+      setAuthStatus('signed-out');
+      setError('Could not restore your session. Please sign in again.');
+    });
+    return () => { cancelled = true; };
+  }, []);
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    const result = await verifyAdmin(password);
-    if (result.success) {
-      sessionStorage.setItem('admin_auth', 'true');
-      window.dispatchEvent(new Event('admin-auth-change'));
-      loadProjects();
-    } else {
-      alert('Access Denied');
+  useEffect(() => {
+    if (authStatus !== 'authenticated') return;
+    let cancelled = false;
+    Promise.all([getProjects(), getFeatured()]).then(([data, feat]) => {
+      if (cancelled) return;
+      setProjects(data);
+      // Preserve an unsaved featured draft when signing back in after session expiry.
+      setFeatured((current) => current ?? feat);
+    }).catch(() => {
+      if (!cancelled) setError('Could not load admin data. Please try refreshing.');
+    });
+    return () => { cancelled = true; };
+  }, [authStatus]);
+
+  async function runAction<T extends { success: boolean; error?: string; code?: string }>(
+    action: () => Promise<T>,
+    onSuccess?: (result: T) => void | Promise<void>,
+  ) {
+    if (pending) return;
+    setPending(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const result = await action();
+      if (!result.success) {
+        if (result.code === 'UNAUTHORIZED') setAuthStatus('signed-out');
+        setError(result.error ?? 'The request failed. Please try again.');
+        return;
+      }
+      await onSuccess?.(result);
+    } catch {
+      setError('The request failed. Check your connection and try again.');
+    } finally {
+      setPending(false);
     }
   }
 
-  async function loadProjects() {
-    const data = await getProjects();
-    setProjects(data);
-    const feat = await getFeatured();
-    if (feat) setFeatured(feat);
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    await runAction(() => verifyAdmin(password), () => {
+      setPassword('');
+      setAuthStatus('authenticated');
+    });
+  }
+
+  async function handleLogout() {
+    await runAction(logoutAdmin, () => {
+      setAuthStatus('signed-out');
+      setPassword('');
+      setEditing(null);
+      setProjects([]);
+      setFeatured(null);
+    });
   }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!editing) return;
-    await saveProject(editing);
-    setEditing(null);
-    loadProjects();
+    await runAction(() => saveProject(editing), async () => {
+      setProjects(await getProjects());
+      setEditing(null);
+      setNotice('Project saved.');
+    });
   }
 
   async function handleDelete(id: string) {
-    if (confirm('Are you sure?')) {
-      await deleteProject(id);
-      loadProjects();
+    if (!confirm('Are you sure?')) return;
+    await runAction(() => deleteProject(id), async () => {
+      setProjects(await getProjects());
+      setEditing((current) => current?.id === id ? null : current);
+      setNotice('Project deleted.');
+    });
+  }
+
+  async function handleUpload(file: File) {
+    if (!editing) return;
+    if (file.size === 0 || file.size > 900 * 1024) {
+      setError('Please choose a JPEG, PNG, or WebP image no larger than 900 KB.');
+      return;
     }
+    const projectId = editing.id;
+    const formData = new FormData();
+    formData.append('file', file);
+    await runAction(() => uploadImage(formData), (result) => {
+      if (result.success) {
+        setEditing((current) => current?.id === projectId ? { ...current, imageUrl: result.url } : current);
+      }
+    });
   }
 
   function createNew() {
@@ -81,7 +128,15 @@ export default function AdminPage() {
     });
   }
 
-  if (!isAuthenticated) {
+  if (authStatus === 'checking') {
+    return (
+      <div className="min-h-screen bg-deep-charcoal text-white flex items-center justify-center p-4" role="status">
+        Checking admin session…
+      </div>
+    );
+  }
+
+  if (authStatus !== 'authenticated') {
     return (
       <div className="min-h-screen bg-deep-charcoal flex items-center justify-center p-4">
         <form onSubmit={handleLogin} className="w-full max-w-md bg-white/5 border border-white/10 p-8 rounded-xl backdrop-blur-sm">
@@ -93,13 +148,20 @@ export default function AdminPage() {
           <h2 className="text-2xl font-bold text-white text-center mb-6 font-mono">Admin Access</h2>
           <input
             type="password"
+            name="password"
+            autoComplete="current-password"
+            aria-label="Admin password"
+            maxLength={1024}
+            required
+            disabled={pending}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter Passphrase"
             className="w-full bg-black/40 border border-white/10 p-3 rounded text-white focus:border-electric-cyan outline-none mb-4 text-center font-mono"
           />
-          <button type="submit" className="w-full bg-electric-cyan text-deep-charcoal font-bold py-3 rounded hover:bg-cyan-300 transition-colors font-mono">
-            Unlock System
+          {error && <p role="alert" className="text-red-300 text-sm mb-4">{error}</p>}
+          <button type="submit" disabled={pending} className="w-full bg-electric-cyan text-deep-charcoal font-bold py-3 rounded hover:bg-cyan-300 transition-colors font-mono disabled:opacity-50">
+            {pending ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
       </div>
@@ -107,15 +169,15 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-deep-charcoal text-white p-8 font-mono">
+    <div className="min-h-screen bg-deep-charcoal text-white p-8 font-mono" aria-busy={pending}>
+      {error && <p role="alert" className="text-red-300 mb-4">{error}</p>}
+      {notice && <p role="status" className="text-electric-cyan mb-4">{notice}</p>}
+      <fieldset disabled={pending} className="min-w-0">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-electric-cyan">ADMIN // DASHBOARD</h1>
         <div className="flex gap-4">
           <button
-            onClick={() => {
-              sessionStorage.removeItem('admin_auth');
-              window.dispatchEvent(new Event('admin-auth-change'));
-            }}
+            onClick={handleLogout}
             className="text-sm text-gray-400 hover:text-white"
           >
             Logout
@@ -207,20 +269,16 @@ export default function AdminPage() {
                   <div className="flex-1">
                     <input
                       type="file"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        if (!e.target.files?.[0]) return;
-                        const formData = new FormData();
-                        formData.append('file', e.target.files[0]);
-                        const result = await import('@/app/actions').then((mod) => mod.uploadImage(formData));
-                        if (result.success && result.url) {
-                          setEditing({ ...editing, imageUrl: result.url });
-                        } else {
-                          alert('Upload failed');
-                        }
+                      accept="image/jpeg,image/png,image/webp"
+                      aria-label="Upload project image"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = '';
+                        if (file) void handleUpload(file);
                       }}
                       className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-electric-cyan file:text-deep-charcoal hover:file:bg-cyan-300 transition-colors cursor-pointer"
                     />
+                    <p className="text-xs text-gray-400 mt-2">JPEG, PNG, or WebP · maximum 900 KB</p>
                   </div>
                 </div>
               </div>
@@ -358,10 +416,7 @@ export default function AdminPage() {
               </div>
 
               <button
-                onClick={async () => {
-                  await saveFeatured(featured);
-                  alert('Featured startup saved!');
-                }}
+                onClick={() => runAction(() => saveFeatured(featured), () => setNotice('Featured startup saved.'))}
                 className="w-full bg-electric-cyan text-deep-charcoal font-bold py-2 rounded hover:bg-cyan-300 transition-colors"
               >
                 Save Featured Startup
@@ -372,6 +427,7 @@ export default function AdminPage() {
           )}
         </div>
       )}
+      </fieldset>
     </div>
   );
 }

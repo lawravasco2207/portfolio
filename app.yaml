@@ -8,6 +8,12 @@ services:
     tag: latest
   http_port: 3000
   envs:
+  - key: ADMIN_PASSWORD
+    scope: RUN_TIME
+    type: SECRET
+  - key: ADMIN_SESSION_SECRET
+    scope: RUN_TIME
+    type: SECRET
   - key: SMTP_HOST
     scope: RUN_TIME
     type: SECRET

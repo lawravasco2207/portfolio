@@ -4,15 +4,21 @@ import {
   PutObjectCommand,
 } from '@aws-sdk/client-s3';
 
-const spacesClient = new S3Client({
-  endpoint: process.env.DO_SPACES_ENDPOINT!,
-  region: process.env.DO_SPACES_REGION!,
-  credentials: {
-    accessKeyId: process.env.DO_SPACES_KEY!,
-    secretAccessKey: process.env.DO_SPACES_SECRET!,
-  },
-  forcePathStyle: false,
-});
+let spacesClient: S3Client | undefined;
+
+function getSpacesClient() {
+  if (!hasSpacesConfig()) throw new Error('DigitalOcean Spaces is not configured.');
+  spacesClient ??= new S3Client({
+    endpoint: process.env.DO_SPACES_ENDPOINT!,
+    region: process.env.DO_SPACES_REGION!,
+    credentials: {
+      accessKeyId: process.env.DO_SPACES_KEY!,
+      secretAccessKey: process.env.DO_SPACES_SECRET!,
+    },
+    forcePathStyle: false,
+  });
+  return spacesClient;
+}
 
 const BUCKET = process.env.DO_SPACES_BUCKET!;
 
@@ -37,7 +43,7 @@ export async function getJSON<T>(key: string): Promise<T | null> {
 
   try {
     const command = new GetObjectCommand({ Bucket: BUCKET, Key: key });
-    const response = await spacesClient.send(command);
+    const response = await getSpacesClient().send(command, { abortSignal: AbortSignal.timeout(6000) });
     const body = await response.Body?.transformToString('utf-8');
     if (!body) return null;
     return JSON.parse(body) as T;
@@ -45,7 +51,7 @@ export async function getJSON<T>(key: string): Promise<T | null> {
     const code = (error as { name?: string }).name;
     if (code === 'NoSuchKey') return null;
     console.error(`[Spaces] Failed to GET ${key}:`, error);
-    return null;
+    throw error;
   }
 }
 
@@ -64,7 +70,7 @@ export async function putJSON<T>(key: string, data: T): Promise<void> {
     ContentType: 'application/json',
     ACL: 'private',
   });
-  await spacesClient.send(command);
+  await getSpacesClient().send(command, { abortSignal: AbortSignal.timeout(10000) });
 }
 
 /**
@@ -87,7 +93,7 @@ export async function uploadFile(
     ContentType: contentType,
     ACL: 'public-read',
   });
-  await spacesClient.send(command);
+  await getSpacesClient().send(command, { abortSignal: AbortSignal.timeout(10000) });
 
   // Return the CDN / public URL
   const endpoint = process.env.DO_SPACES_ENDPOINT!;

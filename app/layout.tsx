@@ -1,55 +1,32 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { SocialLinks } from '@/components/SocialLinks';
+import { MotionProvider } from '@/components/motion/MotionProvider';
 
 function getMetadataBase() {
   const fallbackUrl = 'http://localhost:3000';
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL ?? fallbackUrl;
-
   try {
     const url = new URL(configuredUrl);
-
-    if (url.protocol === 'http:' || url.protocol === 'https:') {
-      return url;
-    }
+    if (url.protocol === 'http:' || url.protocol === 'https:') return url;
   } catch (error) {
     console.warn('Invalid NEXT_PUBLIC_SITE_URL; falling back to localhost.', error);
   }
-
   return new URL(fallbackUrl);
 }
 
+const title = 'Lawrence Musyoka | Software Engineer & Founder';
+const description = 'Lawrence Musyoka builds applications and integrations that make complex workflows usable, from Rust model tooling to web products and APIs. Explore case studies, technical notes, and experiments.';
+
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
-  title: 'Larry | Full Stack Engineer & Systems Architect',
-  description:
-    'Full Stack Engineering // AI Systems // Cloud Infrastructure. I help teams ship dependable products, cloud systems, and AI-enhanced workflows.',
-  keywords: [
-    'full stack engineer',
-    'next.js developer',
-    'ai systems engineer',
-    'cloud infrastructure',
-    'software engineer portfolio',
-  ],
+  title,
+  description,
+  keywords: ['software engineer', 'full stack development', 'API development', 'AI integration', 'Talosys', 'Rust', 'Nairobi', 'Lawrence Musyoka'],
   authors: [{ name: 'Lawrence Musyoka' }],
   creator: 'Lawrence Musyoka',
-  icons: {
-    icon: '/favicon.jpg',
-  },
-  openGraph: {
-    title: 'Larry | Full Stack Engineer & Systems Architect',
-    description:
-      'Full Stack Engineering // AI Systems // Cloud Infrastructure. Product-minded engineering with measurable outcomes.',
-    type: 'website',
-    images: ['/favicon.jpg'],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Larry | Full Stack Engineer & Systems Architect',
-    description:
-      'Product-minded full stack engineering for AI-enabled applications and cloud systems.',
-    images: ['/favicon.jpg'],
-  },
+  icons: { icon: '/brand-mark.svg', apple: '/favicon.jpg' },
+  openGraph: { title, description, type: 'website', locale: 'en_KE', siteName: 'Lawrence Musyoka' },
+  twitter: { card: 'summary_large_image', title, description, images: ['/opengraph-image'] },
 };
 
 const personSchema = {
@@ -57,39 +34,25 @@ const personSchema = {
   '@type': 'Person',
   name: 'Lawrence Musyoka',
   alternateName: 'Larry',
-  jobTitle: 'Full Stack Engineer & Systems Architect',
-  description:
-    'Full stack engineer focused on AI systems, cloud infrastructure, and reliable software delivery.',
+  jobTitle: 'Software Engineer',
+  description,
   email: 'syokslawrence@gmail.com',
   url: 'https://github.com/lawravasco2207',
+  homeLocation: { '@type': 'Place', name: 'Nairobi, Kenya' },
   sameAs: [
     'https://github.com/lawravasco2207',
     'https://www.linkedin.com/in/lawrence-musyoka-b58a1836a/',
     'https://x.com/lawravasco',
   ],
-  knowsAbout: [
-    'Next.js',
-    'TypeScript',
-    'Cloud Infrastructure',
-    'AI Workflows',
-    'Product Engineering',
-  ],
+  knowsAbout: ['Software Engineering', 'Web Applications', 'APIs', 'AI Integration', 'Rust', 'Go', 'TypeScript', 'Cloud Infrastructure', 'BIM', 'IFC'],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="antialiased bg-deep-charcoal text-soft-white selection:bg-electric-cyan selection:text-deep-charcoal">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
-        />
-        <SocialLinks />
-        {children}
+      <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

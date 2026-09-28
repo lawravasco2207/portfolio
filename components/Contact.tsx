@@ -1,190 +1,204 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, Send, Twitter } from 'lucide-react';
-import { useState, useTransition } from 'react';
+import { ArrowDownRight, ArrowUpRight, Mail, Send } from 'lucide-react';
+import { useRef, useState, type FormEvent } from 'react';
 import { sendEmail } from '@/app/actions';
+import { SocialLinks } from '@/components/SocialLinks';
+
+const emptyForm = { name: '', company: '', email: '', message: '' };
+const fieldClassName =
+  'w-full rounded-xl border border-line bg-canvas px-4 py-3 text-base text-paper placeholder:text-muted focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-60';
+
+type FormStatus = {
+  type: 'idle' | 'sending' | 'success' | 'error';
+  message: string;
+};
 
 export function Contact() {
-  const [isPending, startTransition] = useTransition();
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    company: '',
-    message: '',
-  });
-  const [status, setStatus] = useState<{ type: 'idle' | 'success' | 'error'; message: string }>({
-    type: 'idle',
-    message: '',
-  });
+  const submissionInFlight = useRef(false);
+  const [form, setForm] = useState(emptyForm);
+  const [status, setStatus] = useState<FormStatus>({ type: 'idle', message: '' });
+  const isPending = status.type === 'sending';
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setStatus({ type: 'idle', message: '' });
+    if (submissionInFlight.current) return;
 
-    startTransition(async () => {
-      const result = await sendEmail(form);
+    const data = {
+      name: form.name.trim(),
+      company: form.company.trim(),
+      email: form.email.trim(),
+      message: form.message.trim(),
+    };
 
-      if (result.success) {
-        setStatus({
-          type: 'success',
-          message: 'Transmission delivered. Larry will get back to you soon.',
-        });
-        setForm({ name: '', email: '', company: '', message: '' });
-        return;
-      }
-
+    if (!data.name || data.message.length < 10) {
       setStatus({
         type: 'error',
-        message: result.error ?? 'Transmission failed. Please try again or email directly.',
+        message: 'Please add your name and a message of at least 10 characters, not just spaces.',
       });
-    });
+      return;
+    }
+
+    // Lock immediately, before React renders the disabled controls.
+    submissionInFlight.current = true;
+    setStatus({ type: 'sending', message: 'Sending your message…' });
+
+    try {
+      const result = await sendEmail(data);
+
+      if (result.success) {
+        setForm(emptyForm);
+        setStatus({ type: 'success', message: 'Thanks for reaching out. Your message has been sent.' });
+      } else {
+        setStatus({
+          type: 'error',
+          message: `${result.error || 'Your message could not be sent.'} Your draft is still here. You can try again or email me directly.`,
+        });
+      }
+    } catch {
+      setStatus({
+        type: 'error',
+        message: 'I couldn’t confirm that your message was sent. Your draft is still here; please try again or email me directly.',
+      });
+    } finally {
+      submissionInFlight.current = false;
+    }
   };
 
   return (
-    <section id="contact" aria-label="Contact form" className="py-20 scroll-mt-24">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true, margin: '-50px' }}
-        className="relative w-full bg-black/35 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-lg overflow-hidden"
-      >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-electric-cyan/50 to-transparent" />
-
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div>
-            <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-gray-500">secure contact channel</p>
-            <h3 className="text-3xl font-bold text-white mb-4">
-              INITIATE <span className="text-electric-cyan">TRANSMISSION</span>
-            </h3>
-            <p className="text-gray-400 mb-8 leading-relaxed">
-              Need a product partner who can translate an idea into shipped software, reliable
-              infrastructure, and clear execution? Open a channel and share what you are building.
+    <section
+      id="contact"
+      aria-labelledby="contact-title"
+      className="section-spacing border-t border-line bg-surface/50 text-paper"
+    >
+      <div className="section-shell">
+        <p className="eyebrow mb-6"><span className="text-accent">06</span> / Correspondence</p>
+        <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-20">
+          <div className="min-w-0">
+            <div data-parallax aria-hidden="true" className="contact-orbit mb-8"><ArrowDownRight size={32} strokeWidth={1.25} /></div>
+            <h2 id="contact-title" data-reveal className="section-title max-w-xl">
+              Contact
+            </h2>
+            <p className="body-copy mt-6 max-w-lg">
+              For software projects through Talosys, engineering roles, or a technical conversation.
+            </p>
+            <p className="body-copy mt-4 max-w-lg">
+              A short description of the problem is enough to start. If there’s an existing system,
+              include the stack, what needs to change, and any timing constraints.
             </p>
 
-            <div className="space-y-4">
+            <div className="mt-8 border-t border-line pt-6">
+              <p className="mb-2 text-sm text-muted">Prefer email? Write to me directly.</p>
               <a
                 href="mailto:syokslawrence@gmail.com"
-                className="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 rounded-lg hover:bg-white/[0.06] hover:border-electric-cyan/50 transition-all group/item"
+                className="inline-flex min-h-11 max-w-full items-center gap-3 rounded-sm text-base text-paper underline decoration-line underline-offset-4 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:text-lg"
               >
-                <div className="p-3 bg-electric-cyan/10 rounded-full text-electric-cyan group-hover/item:scale-110 transition-transform">
-                  <Mail className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 font-mono">DIRECT_LINK</div>
-                  <div className="text-white font-bold">syokslawrence@gmail.com</div>
-                </div>
+                <Mail aria-hidden="true" className="h-5 w-5 shrink-0 text-accent" />
+                <span className="min-w-0 break-all">syokslawrence@gmail.com</span>
+                <ArrowUpRight aria-hidden="true" className="h-4 w-4 shrink-0" />
               </a>
-
-              <a
-                href="https://www.linkedin.com/in/lawrence-musyoka-b58a1836a/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 rounded-lg hover:bg-white/[0.06] hover:border-blueprint-blue/50 transition-all group/item"
-              >
-                <div className="p-3 bg-blueprint-blue/10 rounded-full text-blueprint-blue group-hover/item:scale-110 transition-transform">
-                  <Linkedin className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 font-mono">PRO_NETWORK</div>
-                  <div className="text-white font-bold">LinkedIn profile</div>
-                </div>
-              </a>
-
-              <a
-                href="https://github.com/lawravasco2207"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 rounded-lg hover:bg-white/[0.06] hover:border-white/40 transition-all group/item"
-              >
-                <div className="p-3 bg-white/10 rounded-full text-white group-hover/item:scale-110 transition-transform">
-                  <Github className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 font-mono">CODEBASE</div>
-                  <div className="text-white font-bold">github.com/lawravasco2207</div>
-                </div>
-              </a>
-
-              <a
-                href="https://x.com/lawravasco"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 rounded-lg hover:bg-white/[0.06] hover:border-electric-cyan/50 transition-all group/item"
-              >
-                <div className="p-3 bg-electric-cyan/10 rounded-full text-electric-cyan group-hover/item:scale-110 transition-transform">
-                  <Twitter className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 font-mono">LIVE_FEED</div>
-                  <div className="text-white font-bold">x.com/lawravasco</div>
-                </div>
-              </a>
+              <div className="mt-5">
+                <SocialLinks label="Larry’s social and contact links" />
+              </div>
             </div>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1 font-mono">IDENTITY</label>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
-                className="w-full bg-black/50 border border-white/10 p-3 rounded text-white focus:border-electric-cyan outline-none transition-colors"
-                placeholder="Your name"
-                autoComplete="name"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1 font-mono">COORDINATES</label>
-              <input
-                type="email"
-                value={form.email}
-                onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
-                className="w-full bg-black/50 border border-white/10 p-3 rounded text-white focus:border-electric-cyan outline-none transition-colors"
-                placeholder="Email address"
-                autoComplete="email"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1 font-mono">ORGANIZATION</label>
-              <input
-                type="text"
-                value={form.company}
-                onChange={(event) => setForm((prev) => ({ ...prev, company: event.target.value }))}
-                className="w-full bg-black/50 border border-white/10 p-3 rounded text-white focus:border-electric-cyan outline-none transition-colors"
-                placeholder="Company / product / team"
-                autoComplete="organization"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1 font-mono">PAYLOAD</label>
-              <textarea
-                value={form.message}
-                onChange={(event) => setForm((prev) => ({ ...prev, message: event.target.value }))}
-                className="w-full bg-black/50 border border-white/10 p-3 rounded text-white focus:border-electric-cyan outline-none h-32 transition-colors"
-                placeholder="What are you building, what is blocked, and what outcome do you want?"
-                required
-              />
-            </div>
-            {status.type !== 'idle' && (
-              <p className={`text-sm ${status.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
-                {status.message}
-              </p>
-            )}
+          <form
+            onSubmit={handleSubmit}
+            aria-labelledby="contact-form-title"
+            aria-describedby="contact-form-note"
+            className="min-w-0 rounded-3xl border border-line bg-canvas p-5 shadow-[0_16px_60px_-40px_rgba(32,35,43,0.25)] sm:p-8"
+          >
+            <h3 id="contact-form-title" className="text-xl font-semibold tracking-tight">Send me a note</h3>
+            <p id="contact-form-note" className="mt-2 text-sm leading-relaxed text-muted">
+              All fields are required except company or team.
+            </p>
+
+            <fieldset disabled={isPending} aria-busy={isPending} className="mt-6 min-w-0 space-y-5">
+              <legend className="sr-only">Your contact details and message</legend>
+              <div>
+                <label htmlFor="contact-name" className="mb-2 block text-sm font-medium">Your name</label>
+                <input
+                  id="contact-name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  maxLength={100}
+                  value={form.name}
+                  onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+                  className={fieldClassName}
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-email" className="mb-2 block text-sm font-medium">Email address</label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  maxLength={254}
+                  value={form.email}
+                  onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
+                  className={fieldClassName}
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-company" className="mb-2 block text-sm font-medium">
+                  Company or team <span className="font-normal text-muted">(optional)</span>
+                </label>
+                <input
+                  id="contact-company"
+                  name="company"
+                  type="text"
+                  autoComplete="organization"
+                  maxLength={200}
+                  value={form.company}
+                  onChange={(event) => setForm((prev) => ({ ...prev, company: event.target.value }))}
+                  className={fieldClassName}
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-message" className="mb-2 block text-sm font-medium">What’s on your mind?</label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows={6}
+                  required
+                  minLength={10}
+                  maxLength={5000}
+                  aria-describedby="contact-message-hint"
+                  placeholder="What are you working on? What do you need help with?"
+                  value={form.message}
+                  onChange={(event) => setForm((prev) => ({ ...prev, message: event.target.value }))}
+                  className={`${fieldClassName} min-h-40 resize-y`}
+                />
+                <p id="contact-message-hint" className="mt-2 text-xs leading-relaxed text-muted">
+                  10–5,000 characters. A little context is a good place to start.
+                </p>
+              </div>
+            </fieldset>
+
+            <p
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              className={`mt-4 min-h-6 text-sm leading-relaxed ${status.type === 'error' ? 'text-ochre' : status.type === 'success' ? 'text-accent' : 'text-muted'}`}
+            >
+              {status.message}
+            </p>
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-electric-cyan text-deep-charcoal font-bold py-4 rounded flex items-center justify-center gap-2 hover:bg-cyan-300 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              className="button-primary mt-4 w-full justify-center gap-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Send className="w-5 h-5" />
-              {isPending ? 'SENDING...' : 'SEND TRANSMISSION'}
+              <Send aria-hidden="true" className="h-4 w-4" />
+              {isPending ? 'Sending…' : 'Send message'}
             </button>
           </form>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

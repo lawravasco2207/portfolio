@@ -2,17 +2,17 @@
   "profile": {
     "name": "Lawrence Musyoka",
     "handle": "Larry",
-    "role": "Full Stack Engineer & Systems Builder",
+    "role": "Software Engineer & Founder",
     "location": "Nairobi, Kenya",
     "timezone": "Africa/Nairobi",
-    "availability": "Available for select builds",
-    "thesis": "I build production systems that turn engineering ambition into operating leverage.",
-    "summary": "Founder-minded full stack engineer focused on AI-enabled products, cloud infrastructure, BIM-adjacent workflows, and reliable delivery systems.",
+    "availability": "Project enquiries through Talosys",
+    "thesis": "Applications, APIs, systems tooling, and AI integrations.",
+    "summary": "Software engineer and founder of Talosys, based in Nairobi. I work across applications, backend systems, desktop integrations, and AI workflows. Construction and engineering tools are an ongoing area of interest.",
     "focus": [
-      "AI-enabled product systems",
-      "Cloud-native deployment",
-      "Engineering workflow automation",
-      "Operational dashboards and internal tools"
+      "Web applications and full-stack development",
+      "APIs, data models, and backend systems",
+      "Systems programming and desktop integrations",
+      "AI integration and workflow automation"
     ],
     "links": {
       "github": "https://github.com/lawravasco2207",
@@ -53,7 +53,7 @@
     {
       "id": "full-stack",
       "label": "Full Stack Architecture",
-      "source": "Vex tooling + portfolio control surface",
+      "source": "Full-stack applications and integration work",
       "modules": ["Next.js", "React", "TypeScript", "Node.js", ".NET", "PostgreSQL"]
     },
     {
@@ -78,8 +78,8 @@
   "changelog": [
     {
       "date": "2026",
-      "title": "Vex systems became the live artifact focus",
-      "description": "The portfolio live surface centers Vex, vex-bridge, and Vex Atlas as the active source systems worth inspecting."
+      "title": "An engineering index and notebook",
+      "description": "Projects grouped by engineering area, a software practice through Talosys, technical references, and local experiments. AEC work remains part of the index rather than the whole identity."
     },
     {
       "date": "2025",

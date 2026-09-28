@@ -1,12 +1,59 @@
 'use server';
 
 import nodemailer from 'nodemailer';
+import { randomUUID } from 'node:crypto';
+import { cookies } from 'next/headers';
 import { getJSON, putJSON, uploadFile } from '@/lib/spaces';
+import {
+  ADMIN_SESSION_SECONDS,
+  createAdminLoginLimiter,
+  createAdminSession,
+  getAdminConfig,
+  matchesAdminPassword,
+  verifyAdminSession,
+} from '@/lib/admin-auth';
+import { getUploadImageType, MAX_IMAGE_BYTES } from '@/lib/admin-upload';
 import localFeatured from '@/data/featured.json';
 import localProjects from '@/data/projects.json';
 
 const PROJECTS_KEY = 'data/projects.json';
 const FEATURED_KEY = 'data/featured.json';
+const ADMIN_COOKIE = process.env.NODE_ENV === 'production' ? '__Host-portfolio-admin' : 'portfolio-admin';
+const ADMIN_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict' as const,
+  path: '/',
+  maxAge: ADMIN_SESSION_SECONDS,
+};
+const consumeLoginAttempt = createAdminLoginLimiter();
+
+type AdminActionFailure = { success: false; error: string; code?: 'UNAUTHORIZED' };
+
+async function isAdminAuthenticated(): Promise<boolean> {
+  const config = getAdminConfig();
+  if (!config) return false;
+  const cookieStore = await cookies();
+  return verifyAdminSession(cookieStore.get(ADMIN_COOKIE)?.value, config);
+}
+
+async function requireAdmin(): Promise<AdminActionFailure | null> {
+  return await isAdminAuthenticated() ? null : {
+    success: false,
+    code: 'UNAUTHORIZED',
+    error: 'Your admin session has expired or is unavailable. Please sign in again.',
+  };
+}
+
+export async function getAdminSession() {
+  return { authenticated: await isAdminAuthenticated() };
+}
+
+export async function logoutAdmin() {
+  const cookieStore = await cookies();
+  cookieStore.set(ADMIN_COOKIE, '', { ...ADMIN_COOKIE_OPTIONS, maxAge: 0, expires: new Date(0) });
+  return { success: true as const };
+}
 
 export interface FeaturedStartup {
   title: string;
@@ -30,8 +77,15 @@ export async function getFeatured(): Promise<FeaturedStartup | null> {
 }
 
 export async function saveFeatured(featured: FeaturedStartup) {
-  await putJSON(FEATURED_KEY, featured);
-  return { success: true };
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  try {
+    await putJSON(FEATURED_KEY, featured);
+    return { success: true as const };
+  } catch (error) {
+    console.error('Failed to save featured:', error);
+    return { success: false as const, error: 'Could not save the featured startup. Please try again.' };
+  }
 }
 
 export interface Project {
@@ -46,32 +100,50 @@ export interface Project {
 }
 
 export async function verifyAdmin(password: string) {
-  if (password === 'I love Jacky') {
-    return { success: true };
+  const config = getAdminConfig();
+  if (!config) {
+    return { success: false as const, error: 'Admin sign-in is not configured.' };
   }
-  return { success: false };
+  const attempt = consumeLoginAttempt();
+  if (!attempt.allowed) {
+    return {
+      success: false as const,
+      error: `Too many sign-in attempts. Try again in ${Math.ceil(attempt.retryAfterSeconds / 60)} minute(s).`,
+    };
+  }
+  if (!matchesAdminPassword(password, config)) {
+    return { success: false as const, error: 'Incorrect password.' };
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(ADMIN_COOKIE, createAdminSession(config), ADMIN_COOKIE_OPTIONS);
+  return { success: true as const };
 }
 
 export async function uploadImage(formData: FormData) {
-  const file = formData.get('file') as File;
-  if (!file) {
-    return { success: false, error: 'No file uploaded' };
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  const file = formData instanceof FormData ? formData.get('file') : null;
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false as const, error: 'Please choose an image to upload.' };
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    return { success: false as const, error: 'Images must be 900 KB or smaller.' };
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-  const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
-  const filename = `${uniqueSuffix}-${safeName}`;
-  const key = `uploads/${filename}`;
-
   try {
-    const url = await uploadFile(key, buffer, file.type || 'application/octet-stream');
-    return { success: true, url };
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const imageType = getUploadImageType(buffer);
+    if (!imageType) {
+      return { success: false as const, error: 'Only JPEG, PNG, and WebP image files are supported.' };
+    }
+    // Neither the supplied filename nor browser MIME type is trusted.
+    const key = `uploads/${randomUUID()}.${imageType.extension}`;
+    const url = await uploadFile(key, buffer, imageType.mime);
+    return { success: true as const, url };
   } catch (error) {
     console.error('Upload error:', error);
-    return { success: false, error: 'Upload failed' };
+    return { success: false as const, error: 'Upload failed. Please try again.' };
   }
 }
 
@@ -86,24 +158,39 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function saveProject(project: Project) {
-  const projects = await getProjects();
-  const index = projects.findIndex((p) => p.id === project.id);
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  try {
+    // Only a genuinely missing document may seed a write from bundled content.
+        const projects = [...(await getJSON<Project[]>(PROJECTS_KEY) ?? localProjects as Project[])];
+    const index = projects.findIndex((p) => p.id === project.id);
 
-  if (index >= 0) {
-    projects[index] = project;
-  } else {
-    projects.push(project);
+    if (index >= 0) {
+      projects[index] = project;
+    } else {
+      projects.push(project);
+    }
+
+    await putJSON(PROJECTS_KEY, projects);
+    return { success: true as const };
+  } catch (error) {
+    console.error('Failed to save project:', error);
+    return { success: false as const, error: 'Could not save the project. Please try again.' };
   }
-
-  await putJSON(PROJECTS_KEY, projects);
-  return { success: true };
 }
 
 export async function deleteProject(id: string) {
-  const projects = await getProjects();
-  const filtered = projects.filter((p) => p.id !== id);
-  await putJSON(PROJECTS_KEY, filtered);
-  return { success: true };
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  try {
+    const projects = await getJSON<Project[]>(PROJECTS_KEY) ?? localProjects as Project[];
+    const filtered = projects.filter((p) => p.id !== id);
+    await putJSON(PROJECTS_KEY, filtered);
+    return { success: true as const };
+  } catch (error) {
+    console.error('Failed to delete project:', error);
+    return { success: false as const, error: 'Could not delete the project. Please try again.' };
+  }
 }
 
 function escapeHtml(value: string) {
@@ -115,23 +202,20 @@ function escapeHtml(value: string) {
     .replaceAll("'", '&#39;');
 }
 
-function isValidEmail(email: string) {
-  const emailParts = email.split('@');
-  const emailLocalPart = emailParts[0];
-  const emailDomain = emailParts[1];
+function hasControlCharacters(value: string) {
+  return Array.from(value).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127);
+}
 
+function isValidEmail(email: string) {
+  const parts = email.split('@');
+  const [local, domain] = parts;
   return Boolean(
-    email &&
-      email.length <= 254 &&
-      !/\s/.test(email) &&
-      emailParts.length === 2 &&
-      emailLocalPart &&
-      emailDomain &&
-      !emailLocalPart.startsWith('.') &&
-      !emailLocalPart.endsWith('.') &&
-      !emailDomain.startsWith('.') &&
-      !emailDomain.endsWith('.') &&
-      emailDomain.includes('.'),
+    parts.length === 2 &&
+    local && local.length <= 64 &&
+    /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(local) &&
+    !local.startsWith('.') && !local.endsWith('.') && !local.includes('..') &&
+    domain && domain.includes('.') &&
+    domain.split('.').every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(label)),
   );
 }
 
@@ -141,26 +225,41 @@ export async function sendEmail(data: {
   email: string;
   message: string;
 }) {
+  if (
+    !data || typeof data !== 'object' || Array.isArray(data) ||
+    typeof data.email !== 'string' || typeof data.message !== 'string' ||
+    (data.name !== undefined && typeof data.name !== 'string') ||
+    (data.company !== undefined && typeof data.company !== 'string')
+  ) {
+    return { success: false, error: 'Please provide valid contact details.' };
+  }
+  if (
+    data.email.length > 254 || data.message.length > 5000 ||
+    (data.name?.length ?? 0) > 100 || (data.company?.length ?? 0) > 200
+  ) {
+    return { success: false, error: 'Please keep your name under 100 characters, company under 200, email under 254, and message under 5,000.' };
+  }
+  if ([data.email, data.name ?? '', data.company ?? ''].some(hasControlCharacters) || data.message.includes('\0')) {
+    return { success: false, error: 'Contact details contain unsupported characters.' };
+  }
+
   const email = data.email.trim();
   const message = data.message.trim();
-  const name = data.name?.trim() || 'Terminal Visitor';
+  const name = data.name?.trim() || 'Portfolio visitor';
   const company = data.company?.trim() || 'Not provided';
 
   if (!isValidEmail(email)) {
     return { success: false, error: 'Please provide a valid email address.' };
   }
 
-  if (name.length < 1) {
-    return { success: false, error: 'Please provide your name.' };
-  }
-
   if (message.length < 10) {
     return { success: false, error: 'Please add a little more detail to your message.' };
   }
 
+  const smtpPort = Number(process.env.SMTP_PORT);
   if (
     !process.env.SMTP_HOST ||
-    !process.env.SMTP_PORT ||
+    !Number.isInteger(smtpPort) || smtpPort < 1 || smtpPort > 65535 ||
     !process.env.SMTP_USER ||
     !process.env.SMTP_PASS
   ) {
@@ -169,7 +268,7 @@ export async function sendEmail(data: {
 
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
+    port: smtpPort,
     secure: process.env.SMTP_SECURE === 'true',
     auth: {
       user: process.env.SMTP_USER,
@@ -179,25 +278,25 @@ export async function sendEmail(data: {
 
   try {
     await transporter.sendMail({
-      from: `"Portfolio Terminal" <${process.env.SMTP_USER}>`,
+      from: { name: 'Portfolio contact', address: process.env.SMTP_USER },
       to: 'syokslawrence@gmail.com',
-      subject: `New Transmission from ${name} (${email})`,
-      text: `IDENTITY: ${name}\nEMAIL: ${email}\nORGANIZATION: ${company}\nPAYLOAD:\n${message}`,
+      replyTo: { name, address: email },
+      subject: `Portfolio contact from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\nCompany: ${company}\n\nMessage:\n${message}`,
       html: `
-        <div style="font-family: monospace; background: #000; color: #00E5FF; padding: 20px;">
-          <h2>/// INCOMING TRANSMISSION ///</h2>
-          <p><strong>IDENTITY:</strong> ${escapeHtml(name)}</p>
-          <p><strong>EMAIL:</strong> ${escapeHtml(email)}</p>
-          <p><strong>ORGANIZATION:</strong> ${escapeHtml(company)}</p>
-          <hr style="border-color: #005BCE;" />
-          <p><strong>PAYLOAD:</strong></p>
-          <pre style="white-space: pre-wrap; color: #fff;">${escapeHtml(message)}</pre>
+        <div style="font-family: sans-serif; line-height: 1.6;">
+          <h2>Portfolio contact</h2>
+          <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Company:</strong> ${escapeHtml(company)}</p>
+          <p><strong>Message:</strong></p>
+          <p style="white-space: pre-wrap;">${escapeHtml(message)}</p>
         </div>
       `,
     });
     return { success: true };
   } catch (error) {
     console.error('Email Error:', error);
-    return { success: false };
+    return { success: false, error: 'Your message could not be sent. Please try again later.' };
   }
 }

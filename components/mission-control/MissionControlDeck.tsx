@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Activity, ArrowUpRight, Download, Gauge, GitPullRequest, RadioTower, Server } from 'lucide-react';
 import type { MissionControlPayload } from '@/lib/mission-control/types';
 import { ActivityFeed } from './ActivityFeed';
@@ -131,13 +132,13 @@ export function MissionControlDeck() {
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <a
+        <Link
           href="/resume"
           className="inline-flex items-center gap-2 rounded-md bg-electric-cyan px-5 py-3 text-sm font-bold text-deep-charcoal transition-colors hover:bg-cyan-300"
         >
           <Download className="h-4 w-4" />
           Resume
-        </a>
+        </Link>
         <a
           href="#projects"
           className="inline-flex items-center gap-2 rounded-md border border-white/15 px-5 py-3 text-sm font-bold text-white transition-colors hover:border-electric-cyan/35 hover:bg-white/5"

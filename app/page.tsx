@@ -1,26 +1,29 @@
-import { TechLayout } from '@/components/tech/TechLayout';
-import { TechAboutMe } from '@/components/tech/AboutMe';
-import { TechTimeline } from '@/components/tech/Timeline';
-import { TechProjects } from '@/components/tech/ProjectsShowcase';
-import { CapabilitiesMatrix } from '@/components/tech/CapabilitiesMatrix';
-import { TechTerminal } from '@/components/tech/Terminal';
-import { ImpactSnapshot } from '@/components/tech/ImpactSnapshot';
+import { MotionPage } from '@/components/motion/MotionPage';
+import { Header } from '@/components/portfolio/Header';
+import { Hero } from '@/components/portfolio/Hero';
+import { Story } from '@/components/portfolio/Story';
+import { EngineeringLab } from '@/components/portfolio/EngineeringLab';
+import { Notebook } from '@/components/portfolio/Notebook';
+import { SelectedWork } from '@/components/portfolio/SelectedWork';
+import { Approach } from '@/components/portfolio/Approach';
 import { Contact } from '@/components/Contact';
-import { MissionControlDeck } from '@/components/mission-control/MissionControlDeck';
+import { Footer } from '@/components/Footer';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-deep-charcoal">
-      <TechLayout>
-        <MissionControlDeck />
-        <ImpactSnapshot />
-        <TechAboutMe />
-        <CapabilitiesMatrix />
-        <TechTimeline />
-        <TechProjects />
-        <TechTerminal />
+    <MotionPage id="top">
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <Header />
+      <main id="main-content" tabIndex={-1}>
+        <Hero />
+        <SelectedWork />
+        <Approach />
+        <Notebook />
+        <EngineeringLab />
+        <Story />
         <Contact />
-      </TechLayout>
-    </main>
+      </main>
+      <Footer />
+    </MotionPage>
   );
 }

@@ -1,10 +1,26 @@
 [
   {
+    "id": "atelier",
+    "title": "Atelier",
+    "description": "A marketplace connecting AEC professionals with clients, with AI-assisted proposals and professional matching.",
+    "stack": ["React", "TypeScript", "Go", "PostgreSQL", "Three.js", "Anthropic API"],
+    "link": "https://planmorph.software",
+    "mode": "tech"
+  },
+  {
     "id": "vex",
     "title": "Vex",
     "description": "Semantic version control for BIM and IFC models, built around meaningful model diffs instead of file-level noise.",
     "stack": ["Rust", "IFC", "STEP Part 21", "Merkle hashing", "redb", "GitHub Actions"],
     "githubLink": "https://github.com/PlanMorph-Org/vex",
+    "mode": "tech"
+  },
+  {
+    "id": "brikto",
+    "title": "Brikto",
+    "description": "A professional reputation and knowledge network for construction trades, designed around the people who actually build.",
+    "stack": ["Go", "React", "TypeScript", "PostgreSQL", "Anthropic API", "PWA"],
+    "link": "https://brikto.planmorph.software",
     "mode": "tech"
   },
   {
@@ -21,6 +37,14 @@
     "description": "Cloud system that manages users' actions on Vex: repository metadata, auth, SSH key registry, device pairing, vex-serve callbacks, and browser semantic diff review.",
     "stack": ["ASP.NET Core 8", "C#", "PostgreSQL", "EF Core", "Next.js", "TypeScript", "HMAC callbacks"],
     "githubLink": "https://github.com/Planmorph-Org/architur",
+    "mode": "tech"
+  },
+  {
+    "id": "portfolio",
+    "title": "Portfolio & notebook",
+    "description": "This site: a publishing interface, interactive software studies, authenticated content editing, and optional email and storage integrations.",
+    "stack": ["Next.js", "TypeScript", "React", "Tailwind", "S3 API", "Node.js tests"],
+    "githubLink": "https://github.com/lawravasco2207/portfolio",
     "mode": "tech"
   }
 ]
