@@ -20,7 +20,6 @@ export interface RepositoryConfig {
   id: string;
   owner: string;
   name: string;
-  githubName?: string;
   label: string;
   role: string;
   description: string;

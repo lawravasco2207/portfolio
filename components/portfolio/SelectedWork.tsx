@@ -119,8 +119,8 @@ export function SelectedWork() {
         <div ref={gallery} className="grid grid-cols-1 items-start gap-6 md:grid-cols-2 lg:gap-8">
           {visibleProjects.map((project) => {
             const note = workNotes[project.id];
-            const repositoryLink = safeLink(project.githubLink);
-            const websiteLink = safeLink(project.link);
+            const repositoryLink = project.id === 'vex-atlas' ? undefined : safeLink(project.githubLink);
+            const websiteLink = project.id === 'vex-atlas' ? undefined : safeLink(project.link);
             return (
               <article key={project.id} data-project-card={project.id} className="group min-w-0 rounded-3xl border border-line bg-canvas shadow-[0_4px_20px_-16px_rgba(32,35,43,0.3)] [overflow-wrap:anywhere]">
                 <div className="relative m-2">
@@ -148,9 +148,9 @@ export function SelectedWork() {
                   <ul aria-label={`${project.title} technologies`} className="mt-5 flex flex-wrap gap-1.5">
                     {project.stack?.map((tech) => <li key={tech} className="max-w-full rounded-lg border border-line/70 bg-surface/60 px-2.5 py-1.5 font-mono text-[10px] leading-normal text-muted">{tech}</li>)}
                   </ul>
-                  {(repositoryLink || websiteLink || project.id === 'portfolio' || project.id === 'vex') && (
+                  {(repositoryLink || websiteLink || ['portfolio', 'vex', 'vex-atlas'].includes(project.id)) && (
                     <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1">
-                      {(project.id === 'portfolio' || project.id === 'vex') && <Link href={`/work/${project.id}`} className="inline-flex min-h-11 items-center gap-2 rounded-sm text-xs font-medium text-accent underline underline-offset-4 hover:text-paper">Case study <ArrowUpRight aria-hidden="true" size={15} /><span className="sr-only"> for {project.title}</span></Link>}
+                      {['portfolio', 'vex', 'vex-atlas'].includes(project.id) && <Link href={`/work/${project.id}`} className="inline-flex min-h-11 items-center gap-2 rounded-sm text-xs font-medium text-accent underline underline-offset-4 hover:text-paper">Case study <ArrowUpRight aria-hidden="true" size={15} /><span className="sr-only"> for {project.title}</span></Link>}
                       {repositoryLink && <a href={repositoryLink} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-sm text-xs font-medium text-paper underline decoration-line underline-offset-4 hover:text-accent">Source <ArrowUpRight aria-hidden="true" size={15} className="shrink-0" /><span className="sr-only"> for {project.title} (opens in a new tab)</span></a>}
                       {websiteLink && <a href={websiteLink} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-sm text-xs font-medium text-paper underline decoration-line underline-offset-4 hover:text-accent">Website <ArrowUpRight aria-hidden="true" size={15} className="shrink-0" /><span className="sr-only"> for {project.title} (opens in a new tab)</span></a>}
                     </div>
@@ -167,7 +167,7 @@ export function SelectedWork() {
                       <div><h5 className="eyebrow mb-2">Implementation</h5><p className="text-sm leading-relaxed text-muted">{note.approach}</p></div>
                       <div><h5 className="eyebrow mb-2">Design choice</h5><p className="text-sm leading-relaxed text-paper">{note.decision}</p></div>
                       <div><h5 className="eyebrow mb-2">Engineering question</h5><p className="text-sm leading-relaxed text-paper">{note.question}</p></div>
-                      <p className="border-t border-line pt-4 font-mono text-[10px] leading-relaxed text-muted">Scope documented in {note.source === 'resume' ? <Link href="/resume" className="underline underline-offset-4 hover:text-paper">my résumé</Link> : 'the project description'}. Repository links show published source, which may differ from local work in progress.</p>
+                      <p className="border-t border-line pt-4 font-mono text-[10px] leading-relaxed text-muted">{project.id === 'vex-atlas' ? 'Public overview only. The Vex Atlas source repository is internal; the case study covers the project without linking to private code.' : <>Scope documented in {note.source === 'resume' ? <Link href="/resume" className="underline underline-offset-4 hover:text-paper">my résumé</Link> : 'the project description'}. Repository links show published source, which may differ from local work in progress.</>}</p>
                     </div>
                   </details>
                 )}

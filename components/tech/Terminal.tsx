@@ -81,8 +81,8 @@ const PROJECTS_TEXT = `ACTIVE ARTIFACTS:
   [02] vex-bridge — local API bridge layer
        → https://github.com/PlanMorph-Org/vex-bridge
 
-  [03] Vex Atlas — cloud action manager for Vex users
-       → source linked from the Vex Atlas artifact card
+  [03] Vex Atlas — cloud coordination for Vex users
+       → public project overview: /work/vex-atlas (source is internal)
 
 Type 'status' for live telemetry or 'contact' to open a channel.`;
 
@@ -115,8 +115,7 @@ const STATUS_TEXT = `MISSION CONTROL:
 
 const REPOS_TEXT = `TRACKED REPOSITORIES:
   PlanMorph-Org/vex
-  PlanMorph-Org/vex-bridge
-  Vex Atlas cloud repository`;
+  PlanMorph-Org/vex-bridge`;
 
 export function TechTerminal() {
   const [history, setHistory] = useState<string[]>(['Larry v2.0 — Production Environment', 'Type "help" for available commands.', '']);

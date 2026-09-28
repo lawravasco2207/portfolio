@@ -62,15 +62,10 @@ async function githubFetch<T>(path: string): Promise<T> {
 }
 
 function fallbackRepo(repo: RepositoryConfig, error?: unknown): RepoTelemetry {
-  const { githubName, ...publicRepo } = repo;
-  const sourceName = githubName || repo.name;
-  const fullName = repo.id === 'vex-atlas' ? `${repo.owner}/Vex Atlas` : `${repo.owner}/${sourceName}`;
-  const sourceFullName = `${repo.owner}/${sourceName}`;
-
   return {
-    ...publicRepo,
-    fullName,
-    htmlUrl: `https://github.com/${sourceFullName}`,
+    ...repo,
+    fullName: `${repo.owner}/${repo.name}`,
+    htmlUrl: `https://github.com/${repo.owner}/${repo.name}`,
     homepageUrl: null,
     language: null,
     stars: 0,
@@ -87,23 +82,20 @@ function fallbackRepo(repo: RepositoryConfig, error?: unknown): RepoTelemetry {
 }
 
 export async function getRepoTelemetry(repo: RepositoryConfig): Promise<RepoTelemetry> {
-  const { githubName, ...publicRepo } = repo;
-  const sourceName = githubName || repo.name;
-
   try {
     const [repository, commits, releases] = await Promise.all([
-      githubFetch<GitHubRepositoryResponse>(`/repos/${repo.owner}/${sourceName}`),
-      githubFetch<GitHubCommitResponse[]>(`/repos/${repo.owner}/${sourceName}/commits?per_page=1`),
-      githubFetch<GitHubReleaseResponse[]>(`/repos/${repo.owner}/${sourceName}/releases?per_page=100`),
+      githubFetch<GitHubRepositoryResponse>(`/repos/${repo.owner}/${repo.name}`),
+      githubFetch<GitHubCommitResponse[]>(`/repos/${repo.owner}/${repo.name}/commits?per_page=1`),
+      githubFetch<GitHubReleaseResponse[]>(`/repos/${repo.owner}/${repo.name}/releases?per_page=100`),
     ]);
 
     const latestCommit = commits[0];
     const latestRelease = releases[0];
 
     return {
-      ...publicRepo,
+      ...repo,
       description: repository.description || repo.description,
-      fullName: repo.id === 'vex-atlas' ? `${repo.owner}/Vex Atlas` : repository.full_name,
+      fullName: repository.full_name,
       htmlUrl: repository.html_url,
       homepageUrl: repository.homepage || null,
       language: repository.language,

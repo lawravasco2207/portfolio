@@ -76,6 +76,7 @@ try {
   assert.match(html, /Software engineer/);
   assert.match(html, /Talosys/);
   assert.match(html, /Synthetic dataset/);
+
   start(executable, ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check', '--disable-background-networking', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${profile}`, 'about:blank']);
   await waitFor(`http://127.0.0.1:${debugPort}/json/version`);
   const targets = await (await fetch(`http://127.0.0.1:${debugPort}/json/list`)).json();
@@ -207,6 +208,8 @@ try {
   await wait('document.querySelectorAll("#work article").length === 0');
   await clickText('#work button', 'Clear filters');
   assert.equal(await evaluate('document.querySelectorAll("#work article").length'), 6);
+  assert.ok(await evaluate('!!document.querySelector("[data-project-card=\\"vex-atlas\\"] a[href=\\"/work/vex-atlas\\"]")'));
+  assert.equal(await evaluate('!!document.querySelector("[data-project-card=\\"vex-atlas\\"] a[href*=github]")'), false);
   await clickText('#work article summary', 'Implementation notes');
   assert.ok(await evaluate('document.querySelector("#work article details").open'));
   console.log('PASS: engineering map, delivery/retry/conflict/reset behavior, both state-preserving lab panels, searchable work and area filters.');
@@ -337,13 +340,17 @@ try {
   await screenshot('desktop-note.png');
   console.log('PASS: notebook index, three complete notes, contents anchors, readable code regions, canonical metadata, responsive layout, unknown-note 404.');
 
-  for (const slug of ['portfolio', 'vex']) {
+  for (const slug of ['portfolio', 'vex', 'vex-atlas']) {
     await call('Page.navigate', { url: `${base}/work/${slug}` });
     await wait('document.readyState === "complete" && !!document.querySelector("#case-title")');
     assert.equal(await evaluate('document.querySelectorAll("h1").length'), 1);
     assert.equal(await evaluate('document.querySelector("link[rel=canonical]").href.endsWith(location.pathname)'), true);
     assert.match(await evaluate('document.querySelector("main").textContent'), /My contribution/);
     assert.match(await evaluate('document.querySelector("main").textContent'), /Limits/);
+    if (slug === 'vex-atlas') {
+      assert.match(await evaluate('document.querySelector("main").textContent'), /source kept internal/i);
+      assert.equal(await evaluate('!!document.querySelector("main a[href*=github]")'), false);
+    }
     for (const width of [320, 390, 1440]) {
       await resize(width);
       assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), `Case study overflow for ${slug} at ${width}px`);

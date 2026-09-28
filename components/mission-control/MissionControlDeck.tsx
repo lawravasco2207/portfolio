@@ -33,10 +33,10 @@ const loadingPayload: MissionControlPayload = {
   repositories: [],
   services: [],
   summary: {
-    trackedRepos: 3,
+    trackedRepos: 2,
     liveRepos: 0,
     onlineServices: 0,
-    activeBuilds: ['Vex', 'vex-bridge', 'Vex Atlas'],
+    activeBuilds: ['Vex', 'vex-bridge'],
   },
 };
 
@@ -109,10 +109,10 @@ export function MissionControlDeck() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <SystemMetric icon={GitPullRequest} label="tracked repos" value={payload.summary.trackedRepos} detail="Vex, vex-bridge, and Vex Atlas." />
+        <SystemMetric icon={GitPullRequest} label="tracked repos" value={payload.summary.trackedRepos} detail="Public Vex and vex-bridge repositories only." />
         <SystemMetric icon={Activity} label="live repo feeds" value={payload.summary.liveRepos} detail="GitHub API signals currently reachable." tone="green" />
         <SystemMetric icon={RadioTower} label="release surfaces" value={payload.repositories.filter((repo) => repo.releaseCount > 0).length} detail="Repositories with published releases." tone="amber" />
-        <SystemMetric icon={Server} label="active builds" value={payload.summary.activeBuilds.length} detail="Engine, bridge, and cloud layer." />
+        <SystemMetric icon={Server} label="active builds" value={payload.summary.activeBuilds.length} detail="Engine and bridge." />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[1.5fr_0.9fr]">

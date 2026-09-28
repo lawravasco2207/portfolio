@@ -17,6 +17,16 @@ const studies = {
     limits: 'The experiments use local, synthetic data. SMTP, Spaces, and repository snapshots are optional integrations; this case study does not claim they are configured on a live deployment or measure visitor outcomes.',
     source: 'https://github.com/lawravasco2207/portfolio',
   },
+  'vex-atlas': {
+    title: 'Vex Atlas',
+    category: 'Cloud coordination / engineering data',
+    description: 'A cloud layer for Vex that connects local engineering tools, project data, and browser-based model review.',
+    problem: 'Local model tools need a shared place to coordinate accounts and project work without moving all model processing into the cloud.',
+    contribution: 'My project notes describe my work on an ASP.NET Core API, a PostgreSQL data layer, and a Next.js review interface. The public record covers the scope, not the internal implementation.',
+    decision: 'Keep local model processing distinct from cloud coordination and make the boundary between tools and review workflows explicit.',
+    result: 'This public overview explains the project’s purpose and my documented role. It does not claim a deployment, adoption, or measured performance result.',
+    limits: 'The repository is internal for security reasons. The diagram is a high-level explanation, not production topology or a captured product screen; no private source or live system data is shared here.',
+  },
   vex: {
     title: 'Vex',
     category: 'Systems / engineering data',
@@ -55,6 +65,7 @@ export default async function WorkCaseStudy({ params }: PageProps) {
   const { slug } = await params;
   if (!(slug in studies)) notFound();
   const study = studies[slug as Slug];
+  const source = 'source' in study ? study.source : undefined;
 
   return (
     <div className="min-h-screen bg-canvas text-paper">
@@ -72,13 +83,31 @@ export default async function WorkCaseStudy({ params }: PageProps) {
             <p className="eyebrow mb-6 text-accent">Case study / {study.category}</p>
             <h1 id="case-title" className="section-title">{study.title}</h1>
             <p className="mt-6 max-w-3xl text-xl leading-relaxed sm:text-2xl">{study.description}</p>
-            <a href={study.source} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-accent underline underline-offset-4 hover:text-paper">Inspect the source <ArrowUpRight aria-hidden="true" size={16} /><span className="sr-only"> (opens in a new tab)</span></a>
+            {source ? <a href={source} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-accent underline underline-offset-4 hover:text-paper">Inspect the source <ArrowUpRight aria-hidden="true" size={16} /><span className="sr-only"> (opens in a new tab)</span></a> : <p className="eyebrow mt-6 text-muted">Public overview / source kept internal</p>}
           </header>
 
           {slug === 'portfolio' ? (
             <figure className="mt-10 overflow-hidden rounded-2xl border border-line bg-surface">
               <Image src="/assets/portfolio-home.png" alt="Captured homepage of this portfolio, showing the introduction and engineering map" width={1440} height={1000} sizes="(max-width: 1440px) 100vw, 1280px" className="h-auto w-full" priority />
               <figcaption className="border-t border-line p-4 text-xs leading-relaxed text-muted sm:px-6">Actual homepage capture from the local browser smoke test. The site you are using is the product shown here.</figcaption>
+            </figure>
+          ) : slug === 'vex-atlas' ? (
+            <figure className="mt-10 rounded-2xl border border-line bg-surface p-5 sm:p-8">
+              <p className="eyebrow text-accent">Public scope / based on project notes</p>
+              <ol className="mt-6 grid gap-3 md:grid-cols-3">
+                {[
+                  ['01', 'Local tools', 'Model work stays with the tools that produce it'],
+                  ['02', 'Cloud coordination', 'Accounts and shared project context'],
+                  ['03', 'Browser review', 'A place to inspect model changes together'],
+                ].map(([number, title, detail]) => (
+                  <li key={number} className="min-w-0 rounded-xl border border-line bg-canvas p-4">
+                    <span className="font-mono text-xs text-accent">{number} /</span>
+                    <h2 className="mt-3 text-base font-medium">{title}</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">{detail}</p>
+                  </li>
+                ))}
+              </ol>
+              <figcaption className="mt-5 text-xs leading-relaxed text-muted">Conceptual overview only. It does not expose the repository, internal integrations, or production architecture.</figcaption>
             </figure>
           ) : (
             <figure className="mt-10 rounded-2xl border border-line bg-surface p-5 sm:p-8">
@@ -124,7 +153,7 @@ export default async function WorkCaseStudy({ params }: PageProps) {
 
           <nav aria-label="Explore the evidence" className="mt-12 rounded-2xl border border-line bg-surface p-5 sm:p-7">
             <h2 className="text-xl font-medium">Explore the evidence</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted">{slug === 'portfolio' ? 'Use the site, then inspect its implementation and tests in the source repository.' : 'The local study illustrates the kind of revision question; it does not use the Vex parser or real IFC files.'}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{slug === 'portfolio' ? 'Use the site, then inspect its implementation and tests in the source repository.' : slug === 'vex-atlas' ? 'The project summary and design boundary are public. Source code and internal system details are not.' : 'The local study illustrates the kind of revision question; it does not use the Vex parser or real IFC files.'}</p>
             {slug === 'portfolio' && <ul className="mt-5 grid gap-3 text-sm leading-relaxed sm:grid-cols-2">
               <li><code className="break-all font-mono text-xs text-accent">components/portfolio/SelectedWork.tsx</code><span className="block text-muted">Search, filters, and local content fallback</span></li>
               <li><code className="break-all font-mono text-xs text-accent">lib/delivery-lab.ts</code><span className="block text-muted">Deterministic retry experiment</span></li>
@@ -135,8 +164,8 @@ export default async function WorkCaseStudy({ params }: PageProps) {
               {slug === 'portfolio' ? <>
                 <Link href="/work" className="button-primary">Try the work index <ArrowUpRight aria-hidden="true" size={15} /></Link>
                 <Link href="/lab" className="button-secondary">Try the experiments <ArrowUpRight aria-hidden="true" size={15} /></Link>
-              </> : <Link href="/lab" className="button-secondary">Try the synthetic model study <ArrowUpRight aria-hidden="true" size={15} /></Link>}
-              <a href={study.source} target="_blank" rel="noopener noreferrer" className="button-secondary">Browse source <ArrowUpRight aria-hidden="true" size={15} /><span className="sr-only"> (opens in a new tab)</span></a>
+              </> : slug === 'vex-atlas' ? <Link href="/contact" className="button-primary">Discuss the project <ArrowUpRight aria-hidden="true" size={15} /></Link> : <Link href="/lab" className="button-secondary">Try the synthetic model study <ArrowUpRight aria-hidden="true" size={15} /></Link>}
+              {source && <a href={source} target="_blank" rel="noopener noreferrer" className="button-secondary">Browse source <ArrowUpRight aria-hidden="true" size={15} /><span className="sr-only"> (opens in a new tab)</span></a>}
             </div>
           </nav>
         </article>

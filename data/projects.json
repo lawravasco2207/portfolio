@@ -34,9 +34,8 @@
   {
     "id": "vex-atlas",
     "title": "Vex Atlas",
-    "description": "Cloud system that manages users' actions on Vex: repository metadata, auth, SSH key registry, device pairing, vex-serve callbacks, and browser semantic diff review.",
-    "stack": ["ASP.NET Core 8", "C#", "PostgreSQL", "EF Core", "Next.js", "TypeScript", "HMAC callbacks"],
-    "githubLink": "https://github.com/Planmorph-Org/architur",
+    "description": "Cloud coordination and browser-based model review for Vex, connecting local tools with accounts and engineering projects.",
+    "stack": ["ASP.NET Core", "C#", "PostgreSQL", "EF Core", "Next.js", "TypeScript"],
     "mode": "tech"
   },
   {

@@ -147,13 +147,22 @@ export async function uploadImage(formData: FormData) {
   }
 }
 
+function publicProject(project: Project): Project {
+  if (project.id !== 'vex-atlas') return project;
+  // Older Spaces documents may still contain an internal repository URL.
+  const safe = { ...project };
+  delete safe.githubLink;
+  delete safe.link;
+  return safe;
+}
+
 export async function getProjects(): Promise<Project[]> {
   try {
     const data = await getJSON<Project[]>(PROJECTS_KEY);
-    return data ?? (localProjects as Project[]);
+    return (data ?? (localProjects as Project[])).map(publicProject);
   } catch (error) {
     console.error('Failed to read projects:', error);
-    return localProjects as Project[];
+    return (localProjects as Project[]).map(publicProject);
   }
 }
 
@@ -171,7 +180,7 @@ export async function saveProject(project: Project) {
       projects.push(project);
     }
 
-    await putJSON(PROJECTS_KEY, projects);
+    await putJSON(PROJECTS_KEY, projects.map(publicProject));
     return { success: true as const };
   } catch (error) {
     console.error('Failed to save project:', error);
@@ -185,7 +194,7 @@ export async function deleteProject(id: string) {
   try {
     const projects = await getJSON<Project[]>(PROJECTS_KEY) ?? localProjects as Project[];
     const filtered = projects.filter((p) => p.id !== id);
-    await putJSON(PROJECTS_KEY, filtered);
+    await putJSON(PROJECTS_KEY, filtered.map(publicProject));
     return { success: true as const };
   } catch (error) {
     console.error('Failed to delete project:', error);

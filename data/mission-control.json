@@ -37,15 +37,6 @@
       "label": "vex-bridge",
       "role": "Local API bridge",
       "description": "Local API bridge layer for connecting Vex capabilities to desktop and workflow surfaces."
-    },
-    {
-      "id": "vex-atlas",
-      "owner": "Planmorph-Org",
-      "name": "vex-atlas",
-      "githubName": "architur",
-      "label": "Vex Atlas",
-      "role": "Cloud action manager",
-      "description": "Cloud platform for Vex: manages users, repositories, SSH keys, device pairing, vex-serve callbacks, and browser semantic diff review."
     }
   ],
   "services": [],
@@ -65,8 +56,8 @@
     {
       "id": "cloud-delivery",
       "label": "Cloud Delivery",
-      "source": "Vex Atlas API + web platform",
-      "modules": ["ASP.NET Core", "PostgreSQL", "Next.js", "JWT auth", "Device pairing"]
+      "source": "Vex Atlas cloud coordination work",
+      "modules": ["ASP.NET Core", "PostgreSQL", "Next.js", "Account workflows", "Integration boundaries"]
     },
     {
       "id": "bim-automation",
